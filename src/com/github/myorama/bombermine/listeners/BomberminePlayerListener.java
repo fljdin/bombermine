@@ -1,8 +1,8 @@
 package com.github.myorama.bombermine.listeners;
 
-import org.bukkit.event.player.*;
-
 import com.github.myorama.bombermine.Bombermine;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class BomberminePlayerListener extends PlayerListener {
 	public Bombermine plugin;
@@ -11,6 +11,7 @@ public class BomberminePlayerListener extends PlayerListener {
 		plugin = instance;
 	}
 	
+	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 		
 	}
