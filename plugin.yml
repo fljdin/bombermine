@@ -1,0 +1,9 @@
+name: Bombermine
+main: com.github.myorama.bombermine.Bombermine
+version: 0.1
+
+commands:
+  basic:
+    description: This is a demo command.
+    permission: bombermine.basic
+    usage: /basic [player]
