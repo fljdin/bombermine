@@ -1,0 +1,12 @@
+bombermine:
+  teams:
+  - id: red
+    name: Equipe des rouges
+    spawn: world/0/0/0
+    max: 5
+    flagType: iron_ore
+  - id: blue
+    name: Equipe des bleus
+    spawn: world/0/0/0
+    max: 5
+    flagType: iron_ore

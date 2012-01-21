@@ -1,6 +1,7 @@
 package com.github.myorama.bombermine.models;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +23,17 @@ public class Team {
 	public Team(String n)
 	{
 		name = n;
+	}
+	
+	/* Team constructor from Config */
+	public Team(Map<String,Object> config)
+	{
+		// TODO initialize Team object properties
+		config.get("id");
+		config.get("name");
+		config.get("spawn");
+		config.get("max");
+		config.get("flagType");
 	}
 
 	/* Team methods */

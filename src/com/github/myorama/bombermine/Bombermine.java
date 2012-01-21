@@ -1,18 +1,20 @@
 package com.github.myorama.bombermine;
 
+import com.github.myorama.bombermine.listeners.BomberminePlayerListener;
+import com.github.myorama.bombermine.models.CTFGame;
 import java.util.logging.Logger;
-
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.github.myorama.bombermine.listeners.BomberminePlayerListener;
-
 public class Bombermine extends JavaPlugin {
 
-	Logger log = Logger.getLogger("Minecraft");
+	private static final Logger log = Logger.getLogger(Bombermine.class.getName());
+	private CTFGame ctfGame = null;
 	
+	@Override
 	public void onEnable() {
 		log.info("Bombermine plugin has been enabled.");
 		PluginManager pm = this.getServer().getPluginManager();
@@ -20,12 +22,22 @@ public class Bombermine extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE,
 				new BomberminePlayerListener(this),
 				Event.Priority.Normal, this);
+		
+		// Copying and merging default config.yml file to plugin folder
+		this.getConfig().options().copyDefaults(true);
+		this.saveConfig();
+		
+		// Initialize CTF game
+		this.ctfGame = new CTFGame(this);
+		this.ctfGame.initialize();
 	}
 	
+	@Override
 	public void onDisable() {
 		log.info("Bombermine plugin has been disabled.");
 	}
 	
+	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		return false;
 	}
