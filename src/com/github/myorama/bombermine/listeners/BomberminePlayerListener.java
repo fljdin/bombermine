@@ -1,6 +1,8 @@
-package com.github.myorama.bombermine;
+package com.github.myorama.bombermine.listeners;
 
 import org.bukkit.event.player.*;
+
+import com.github.myorama.bombermine.Bombermine;
 
 public class BomberminePlayerListener extends PlayerListener {
 	public Bombermine plugin;
