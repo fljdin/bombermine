@@ -15,6 +15,11 @@ public class CTFGame {
 		plugin = instance;
 	}
 	
+	public Bombermine getPlugin()
+	{
+		return this.plugin;
+	}
+	
 	/* Game management */
 	public void start() { }
 	
@@ -46,10 +51,5 @@ public class CTFGame {
 		}
 		
 		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
-	}
-	
-	public Bombermine getPlugin()
-	{
-		return this.plugin;
 	}
 }
