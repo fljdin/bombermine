@@ -31,7 +31,10 @@ public class Traps {
 		}
 	}
 		
-	// Lecture de la première ligne et mise en mémoire
+	/**
+	 * Load traps coordinates from specific file
+	 * @param source file
+	 */
 	protected void load(File f) {
 		try {
 			if (!f.exists()) {
@@ -47,7 +50,10 @@ public class Traps {
 		}
 	}
 	
-	// Sauvegarde dans le fichier
+	/**
+	 * Save traps coordinates to specific file
+	 * @param target file
+	 */
 	protected void save(File f) {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f, false));
@@ -57,13 +63,14 @@ public class Traps {
 			Bombermine.log.warning("[Bombermine] "+e.getMessage());
 		}
 	}
-
+	/**
+	 * Save traps coordinates to specific file
+	 */
 	protected void save() {
 		save(file);
 	}	
 	
-	/* traps management */
-	private String formatLocation(Location loc) {
+	protected String formatLocation(Location loc) {
 		return String.format(";%s/%s/%s/%s",
 				loc.getWorld().getName(),
 				loc.getBlockX(),
@@ -71,20 +78,31 @@ public class Traps {
 				loc.getBlockZ());
 	}
 	
+	/**
+	 * Method to know if the block is trapped
+	 * @param Location of block
+	 * @return True or False
+	 */
 	public boolean isTrapped(Location loc) {
 		return (traps.indexOf(formatLocation(loc)) != -1);
 	}
 	
+	/**
+	 * Memorize trap coordinates
+	 * @param trap location
+	 */
 	public void addTrap(Location loc) {
-		// si le piége n'est pas encore posé, on l'ajoute
 		if (!isTrapped(loc)) {
 			traps += formatLocation(loc);
 			save();
 		}
 	}
 	
+	/**
+	 * Remove trap coordinates from all existing
+	 * @param trap location
+	 */
 	public void removeTrap(Location loc) {
-		// si le piége existe, on le supprime
 		if (isTrapped(loc)) {
 			traps.replace(formatLocation(loc), "");
 			save();
