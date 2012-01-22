@@ -5,17 +5,12 @@ import com.github.myorama.bombermine.listeners.BomberminePlayerListener;
 import com.github.myorama.bombermine.models.CTFGame;
 import com.github.myorama.bombermine.models.Traps;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import java.io.File;
 import java.util.logging.Logger;
 
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,13 +22,17 @@ public class Bombermine extends JavaPlugin {
 	private CommandExecutor cmdExec = null;
 	private Traps traps = null;
 	
+	public Traps getTraps() {
+		return traps;
+	}
+
 	@Override
 	public void onEnable() {
 		PluginManager pm = this.getServer().getPluginManager();
 		
-		pm.registerEvent(Event.Type.PLAYER_MOVE,
-				new BomberminePlayerListener(this),
-				Event.Priority.Normal, this);
+		// Register all listeners
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, new BomberminePlayerListener(this), Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new BomberminePlayerListener(this), Event.Priority.Normal, this);
 		
 		// Copying and merging default config.yml file to plugin folder
 		this.getConfig().options().copyDefaults(true);

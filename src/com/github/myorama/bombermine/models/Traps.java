@@ -11,11 +11,11 @@ import org.bukkit.Location;
 
 import com.github.myorama.bombermine.Bombermine;
 
-/*
- * Cette classe gère la localisation des piéges posés dans le jeu
- * à travers la lecture/écriture dans un fichier
+/**
+ * @author myorama
  * 
- * Deuxième version : stockage fichier plat
+ * @category Gameplay
+ * @version 0.1
  */
 public class Traps {
 	
