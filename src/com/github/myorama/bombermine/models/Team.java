@@ -4,48 +4,85 @@ import java.util.ArrayList;
 import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class Team {
-	private String name;
-	private int max;
-	private Location spawn;
-	private ArrayList<Player> players = new ArrayList<Player>();
+	private CTFGame ctfGame;
+	
+	private String name = null;
+	private Integer max = null;
+	private Location spawn = null;
+	private ArrayList<Player> players = null;
 
-	private Block flag;
-	private Location flagLoc;
-	private Material flagType;
-	private ItemStack flagItem;
+	private Block flag = null;
+	private Location flagLoc = null;
+	private Material flagType = null;
+	private ItemStack flagItem = null;
 
-	/* Constructor */
-	public Team(String n)
+	/**
+	 * Constructor with CTFGame instance
+	 * @param ctfGame instance
+	 */
+	public Team(CTFGame ctfGame)
 	{
-		name = n;
+		this.ctfGame = ctfGame;
 	}
 	
-	/* Team constructor from Config */
-	public Team(Map<String,Object> config)
+	/**
+	 * Initialize the Team from config
+	 * @param config map
+	 * @return true if initialized, false otherwise
+	 */
+	public boolean initialize(Map<String,Object> config)
 	{
-		// TODO initialize Team object properties
-		try {
-			//config.get("id");
-			this.name = config.get("name").toString();
-			this.max = Integer.parseInt(config.get("max").toString());
-			this.flagType = Material.getMaterial(config.get("flagType").toString());
-			
-			/* on aura du mal pour lui, sauf si on rŽfŽrencie le Bombermine.getServer()
-			String[] coords = config.get("spawn").toString().split("/");
-			this.spawn = new Location();
-					this.getServer().getWorlds()
-					coords[1],coords[1],coords[1],coords[1];
-			*/
-		} catch (Exception e) {
-			// TODO: handle exception
+		if(config != null){
+			try {
+				this.name = (String)config.get("name");
+				Object cMax = config.get("max");
+				if(cMax instanceof Integer) {
+					this.max = (Integer)cMax;
+				}
+				else if(cMax instanceof String) {
+					try {
+						this.max = new Integer(Integer.parseInt((String)cMax));
+					}
+					catch(NumberFormatException nfe) {
+						this.max = null;
+					}
+				}
+				else {
+					this.max = null;
+				}
+				String cFlagType = config.get("flagType").toString();
+				this.flagType = Material.getMaterial(cFlagType);
+
+				String[] coords = config.get("spawn").toString().split("/");
+				if(coords.length > 0) {
+					World world = this.ctfGame.getPlugin().getServer().getWorld(coords[0]);
+					if(world != null){
+						if(coords.length == 4) {
+							this.spawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
+						}
+						else if(coords.length == 6) {
+							this.spawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
+						}
+					}
+				}
+				
+				// Checking if config has been read successfully
+				if(this.name != null && this.max != null && this.flagType != null && this.spawn != null) {
+					this.players = new ArrayList<Player>();
+					// TODO initialize this.flag, this.flagLoc, this.flagItem ?
+					return true;
+				}
+			} catch (Exception e) {
+				return false;
+			}
 		}
-		config.get("spawn");
+		return false;
 	}
 
 	/* Team methods */

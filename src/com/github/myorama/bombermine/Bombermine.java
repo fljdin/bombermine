@@ -29,7 +29,7 @@ public class Bombermine extends JavaPlugin {
 		// Initialize CTF game
 		this.ctfGame = new CTFGame(this);
 		this.ctfGame.initialize();
-
+		
 		log.info("Bombermine plugin has been enabled.");
 	}
 	

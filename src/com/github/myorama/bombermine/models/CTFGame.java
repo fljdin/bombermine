@@ -34,11 +34,22 @@ public class CTFGame {
 				String id = (String)teamConfigMap.get("id");
 				if(id != null)
 				{
-					this.teams.put(id, new Team(teamConfigMap));
+					Team cTeam = new Team(this);
+					if(cTeam.initialize(teamConfigMap)) {
+						this.teams.put(id, cTeam);
+					}
+					else {
+						Bombermine.log.warning(String.format("Team with id %s failed to load.", id));
+					}
 				}
 			}
 		}
 		
 		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
+	}
+	
+	public Bombermine getPlugin()
+	{
+		return this.plugin;
 	}
 }
