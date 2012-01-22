@@ -3,7 +3,7 @@ main: com.github.myorama.bombermine.Bombermine
 version: 0.1
 
 commands:
-  basic:
-    description: This is a demo command.
-    permission: bombermine.basic
-    usage: /basic [player]
+  bm:
+    description: This is the base command giving help on sub commands
+    permission: bombermine.bm
+    usage: /bm
