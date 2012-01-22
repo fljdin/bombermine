@@ -11,12 +11,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Bombermine extends JavaPlugin {
 
-	private static final Logger log = Logger.getLogger(Bombermine.class.getName());
+	public static final Logger log = Logger.getLogger(Bombermine.class.getName());
 	private CTFGame ctfGame = null;
 	
 	@Override
 	public void onEnable() {
-		log.info("Bombermine plugin has been enabled.");
 		PluginManager pm = this.getServer().getPluginManager();
 		
 		pm.registerEvent(Event.Type.PLAYER_MOVE,
@@ -30,6 +29,8 @@ public class Bombermine extends JavaPlugin {
 		// Initialize CTF game
 		this.ctfGame = new CTFGame(this);
 		this.ctfGame.initialize();
+
+		log.info("Bombermine plugin has been enabled.");
 	}
 	
 	@Override

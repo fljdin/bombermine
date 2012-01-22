@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class CTFGame {
 	
-	private Map<String, Team> teams = new HashMap<>();
+	private Map<String, Team> teams = new HashMap<String, Team>();
 	private Bombermine plugin;
 
 	public CTFGame(Bombermine instance)
@@ -38,5 +38,7 @@ public class CTFGame {
 				}
 			}
 		}
+		
+		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
 	}
 }
