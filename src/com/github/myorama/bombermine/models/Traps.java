@@ -63,15 +63,20 @@ public class Traps {
 			Bombermine.log.warning("[Bombermine] "+e.getMessage());
 		}
 	}
+	
 	/**
-	 * Save traps coordinates to specific file
+	 * Save traps coordinates to default file
 	 */
 	protected void save() {
 		save(file);
 	}	
 	
+	protected String formatLocation(Location loc, String team) {
+		return formatLocation(loc) + team;
+	}
+	
 	protected String formatLocation(Location loc) {
-		return String.format(";%s/%s/%s/%s",
+		return String.format(";%s/%s/%s/%s/",
 				loc.getWorld().getName(),
 				loc.getBlockX(),
 				loc.getBlockY(),
@@ -104,7 +109,7 @@ public class Traps {
 	 */
 	public void removeTrap(Location loc) {
 		if (isTrapped(loc)) {
-			traps.replace(formatLocation(loc), "");
+			traps = traps.replace(formatLocation(loc), "");
 			save();
 		}
 	}

@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class BomberminePlayerListener extends PlayerListener {
 	public Bombermine plugin;
@@ -36,10 +37,13 @@ public class BomberminePlayerListener extends PlayerListener {
 		/**
 		 * Trap drop event
 		 */
-		if (event.getMaterial() == Material.SULPHUR 
-		   && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+		if (event.getMaterial() == Material.SULPHUR && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			// new trap location
 			plugin.getTraps().addTrap(event.getClickedBlock().getLocation());
-			// TODO: remove item from player hand
+			// remove one sulphur on hand
+			int amount = event.getPlayer().getItemInHand().getAmount();
+	        event.getPlayer().setItemInHand(new ItemStack(Material.SULPHUR.getId(), amount - 1));
+			// explicite message
 			event.getPlayer().sendMessage(ChatColor.RED+"You drop an explosive trap!");
 		}
 	}
