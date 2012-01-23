@@ -1,10 +1,8 @@
 package com.github.myorama.bombermine.listeners;
 
-import org.bukkit.Material;
-import org.bukkit.event.Event.Type;
+import com.github.myorama.bombermine.Bombermine;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
-import com.github.myorama.bombermine.Bombermine;
 
 public class BombermineBlockListener extends BlockListener {
 	public Bombermine plugin;
@@ -15,12 +13,19 @@ public class BombermineBlockListener extends BlockListener {
 	
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
-		/**
-		 * No drop explosion
+		
+		/*
+		 * 
+		 * TODO Listener à supprimer :
+		 * 
+		 * D'après la doc "BlockBreakEvent: Called when a block is broken by a PLAYER.
+		 * EntityListener.onEntityExplode(EntityExplodeEvent event) permet de gérer l'explosion en elle même, ainsi que tout les blocs sensés exploser
+		 * 
 		 */
-		Bombermine.log.info(event.getType().toString()); // ça ne fait rien
-		if (event.getType() == Type.ENTITY_EXPLODE) {
-			event.getBlock().setType(Material.AIR);
-		}
+		
+//		Bombermine.log.info(event.getType().toString()); // ça ne fait rien
+//		if (event.getType() == Type.ENTITY_EXPLODE) {
+//			event.getBlock().setType(Material.AIR);
+//		}
 	}
 }
