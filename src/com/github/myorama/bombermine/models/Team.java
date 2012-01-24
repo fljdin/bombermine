@@ -90,6 +90,11 @@ public class Team {
 	public void addPlayer(Player p) { players.add(p); }
 	public ArrayList<Player> getPlayers() { return players; }
 	public boolean hasPlayer(Player p) { return players.contains(p); }
+	public void spawnPlayers() {
+		for(Player p : players) {
+			p.teleport(this.spawn);
+		}
+	}
 	
 	/* Accessors */
 	public String getName() { return name; }
