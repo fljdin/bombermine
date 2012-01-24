@@ -65,4 +65,8 @@ public class Bombermine extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		return false;
 	}
+	
+	public CTFGame getCtfGame(){
+		return this.ctfGame;
+	}
 }

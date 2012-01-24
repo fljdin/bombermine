@@ -4,6 +4,52 @@ version: 0.1
 
 commands:
   bm:
-    description: This is the base command giving help on sub commands
-    permission: bombermine.bm
-    usage: /bm
+    description: This is the base command giving help for all bombermine commands
+
+# a simplifier (uniquement user/moderater/admin)
+permissions:
+  bombermine.*:
+    description: Give all bombermine permissions (be careful, some are admin reserved)
+    children:
+      bombermine.player.*: true
+      bombermine.moderator.*: true
+      bombermine.admin.*: true
+  bombermine.player.*:
+    description: Give classic player permissions
+    children:
+      bombermine.player.join: true
+      bombermine.player.leave: true
+  bombermine.moderator.*:
+    description: Give moderator permissions (restart battle, change player teams, ...)
+    children:
+      bombermine.moderator.kick: true
+      bombermine.moderator.start: true
+      bombermine.moderator.restart: true
+  bombermine.admin.*:
+    description: Give admin permissions used for map creation
+    children:
+      bomberman.admin.setspawn: true
+  bombermine.player.join:
+    description: Allow you to join battle in a specific team
+    default: true
+  bombermine.player.leave:
+    description: Allow you to leave your team
+    default: true
+  bombermine.moderator.join:
+    description: Allow you to force a player to leave
+    default: op
+  bombermine.moderator.leave:
+    description: Allow you to force a player to leave
+    default: op
+  bombermine.moderator.start:
+    description: Allow you to start the battle
+    default: op
+  bombermine.moderator.stop:
+    description: Allow you to stop the battle
+    default: op
+  bombermine.moderator.restart:
+    description: Allow you to restart the battle
+    default: op
+  bombermine.admin.setspawn:
+    description: Allow you to set a team spawn
+    default: op

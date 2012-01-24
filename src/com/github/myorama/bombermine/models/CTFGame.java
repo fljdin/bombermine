@@ -25,7 +25,11 @@ public class CTFGame {
 	
 	public void stop() { }
 	
-	/* Teams management */
+	/**
+	 * Get a team by its id
+	 * @param id
+	 * @return Team or null if id is not found
+	 */
 	public Team getTeamById(String id) { return teams.get(id); }
 	public void addNewTeam(String id, Team team) { teams.put(id, team); }
 	
