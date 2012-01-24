@@ -5,6 +5,8 @@ import com.github.myorama.bombermine.Bombermine;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -38,13 +40,23 @@ public class BomberminePlayerListener extends PlayerListener {
 		 * Trap drop event
 		 */
 		if (event.getMaterial() == Material.SULPHUR && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			// new trap location
-			plugin.getTraps().addTrap(event.getClickedBlock().getLocation());
-			// remove one sulphur on hand
-			int amount = event.getPlayer().getItemInHand().getAmount();
-	        event.getPlayer().setItemInHand(new ItemStack(Material.SULPHUR.getId(), amount - 1));
-			// explicite message
-			event.getPlayer().sendMessage(ChatColor.RED+"You drop an explosive trap!");
+			Block clickedBlock = event.getClickedBlock();
+			
+			// if there is something up the block the player cannot add a trap
+			if(clickedBlock.getRelative(BlockFace.UP, 1).getTypeId() != Material.AIR.getId()){
+				event.getPlayer().sendMessage(ChatColor.RED+"You cannot drop an explosive trap underground");
+			}
+			else{
+				// new trap location
+				plugin.getTraps().addTrap(event.getClickedBlock().getLocation());
+				Block block = event.getClickedBlock();
+				block.getRelative(BlockFace.UP, 1);
+				// remove one sulphur on hand
+				int amount = event.getPlayer().getItemInHand().getAmount();
+				event.getPlayer().setItemInHand(new ItemStack(Material.SULPHUR.getId(), amount - 1));
+				// explicite message
+				event.getPlayer().sendMessage(ChatColor.RED+"You drop an explosive trap!");
+			}
 		}
 	}
 	
