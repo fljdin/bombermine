@@ -26,7 +26,7 @@ public class BomberminePlayerListener extends PlayerListener {
 		 */
 		Location loc = event.getTo().add(0, -1, 0);
 		if (plugin.getTraps().isTrapped(loc)) {
-			loc.getBlock().getWorld().createExplosion(loc, 4F);
+			plugin.getTraps().explode(loc);
 			plugin.getTraps().removeTrap(loc);
 			event.getPlayer().sendMessage(ChatColor.RED+"You walk on an explosive trap! BOOM!");
 		}

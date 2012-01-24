@@ -26,6 +26,11 @@ public class BombermineEntityListener extends EntityListener{
 		List<Block> wouldExplode = event.blockList();
 		for (Block block : wouldExplode) {
 			block.setType(Material.AIR);
+			
+			// Detect if others landmines would explode
+			if (plugin.getTraps().isTrapped(block.getLocation())) {
+				plugin.getTraps().explode(block.getLocation());
+			}
 		}
 	}
 	

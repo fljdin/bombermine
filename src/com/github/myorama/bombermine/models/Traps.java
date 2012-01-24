@@ -21,6 +21,7 @@ public class Traps {
 	
 	private File file;
 	private String traps;
+	private float power = 2F;
 	
 	public Traps(File f) {
 		this.file = f;
@@ -29,6 +30,14 @@ public class Traps {
 		if (traps == null) {
 			traps = "#";
 		}
+	}
+	
+	/**
+	 * Get power explosion value
+	 * @return power value
+	 */
+	public float getPower() {
+		return power;
 	}
 		
 	/**
@@ -112,5 +121,13 @@ public class Traps {
 			traps = traps.replace(formatLocation(loc), "");
 			save();
 		}
+	}
+	
+	/**
+	 * Create an explosion to location
+	 * @param location
+	 */
+	public void explode(Location loc) {
+		loc.getWorld().createExplosion(loc, power);
 	}
 }
