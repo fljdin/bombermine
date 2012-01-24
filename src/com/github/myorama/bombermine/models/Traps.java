@@ -105,22 +105,26 @@ public class Traps {
 	 * Memorize trap coordinates
 	 * @param trap location
 	 */
-	public void addTrap(Location loc) {
+	public boolean addTrap(Location loc) {
 		if (!isTrapped(loc)) {
 			traps += formatLocation(loc);
 			save();
+			return true;
 		}
+		return false;
 	}
 	
 	/**
 	 * Remove trap coordinates from all existing
 	 * @param trap location
 	 */
-	public void removeTrap(Location loc) {
+	public boolean removeTrap(Location loc) {
 		if (isTrapped(loc)) {
 			traps = traps.replace(formatLocation(loc), "");
 			save();
+			return true;
 		}
+		return false;
 	}
 	
 	/**
