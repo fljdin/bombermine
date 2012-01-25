@@ -1,6 +1,7 @@
 bombermine:
   ctfgame:
     max_team_players: 5
+    respawn_cooldown: 10
   teams:
   - id: red
     name: Equipe des rouges

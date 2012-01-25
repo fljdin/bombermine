@@ -39,6 +39,7 @@ public class Bombermine extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, new BomberminePlayerListener(this), Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new BomberminePlayerListener(this), Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, new BombermineEntityListener(this), Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, new BombermineEntityListener(this), Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, new BombermineBlockListener(this), Event.Priority.Normal, this);
 				
 		// Copying and merging default config.yml file to plugin folder

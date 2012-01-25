@@ -61,6 +61,13 @@ public class BomberminePlayerListener extends PlayerListener {
             vec.setY(0.1); // reduce super jump
             player.setVelocity(vec);
 		}
+		
+		/**
+		 * Player freeze respawn
+		 */
+		if (plugin.getCtfGame().isCooldowned(player)) {
+			event.setTo(event.getFrom());
+		}
 	}
 
 	@Override

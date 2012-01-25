@@ -4,11 +4,14 @@ import com.github.myorama.bombermine.Bombermine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class CTFGame {
 
 	private Map<String, Team> teams = new HashMap<String, Team>();
+	private Map<String, Long> cooldown = new HashMap<String, Long>();
 	private final Object teamsLock = new Object();
 	private Bombermine plugin;
 	/**
@@ -165,6 +168,37 @@ public class CTFGame {
 			this.plugin.sendBroadcastMessage(player.getName() + " has left his team (" + currentTeam.getName() + ")");
 			return currentTeam.removePlayer(player);
 		}
+	}
+	
+	/**
+	 * Start counting for player cooldown
+	 * @param player who waiting
+	 */
+	public void addCooldown(Player p) {
+		cooldown.put(p.getName(), System.currentTimeMillis());
+		p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+cooldown+" seconds.");
+	}
+	
+	/**
+	 * Check if player is still immobilized
+	 * @param player
+	 * @return true or false
+	 */
+	public boolean isCooldowned(Player p) {
+
+		try {
+			Long time = cooldown.get(p.getName());
+			Long now = System.currentTimeMillis();
+			Long seconds = plugin.getConfig().getLong("bombermine.ctfgame.respawn_cooldown");
+			
+			if ((now - time) < seconds*100) {
+				return true;
+			}
+			cooldown.remove(p);
+			
+		} catch (NullPointerException e) { }
+		
+		return false;
 	}
 	
 	/**
