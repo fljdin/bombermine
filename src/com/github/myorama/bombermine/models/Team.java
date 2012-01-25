@@ -13,9 +13,9 @@ public class Team {
 	private CTFGame ctfGame;
 	
 	private String name = null;
-	private Integer max = null;
 	private Location spawn = null;
 	private ArrayList<Player> players = null;
+	private final Object playersLock = new Object();
 
 	private Block flag = null;
 	private Location flagLoc = null;
@@ -41,21 +41,6 @@ public class Team {
 		if(config != null){
 			try {
 				this.name = (String)config.get("name");
-				Object cMax = config.get("max");
-				if(cMax instanceof Integer) {
-					this.max = (Integer)cMax;
-				}
-				else if(cMax instanceof String) {
-					try {
-						this.max = new Integer(Integer.parseInt((String)cMax));
-					}
-					catch(NumberFormatException nfe) {
-						this.max = null;
-					}
-				}
-				else {
-					this.max = null;
-				}
 				String cFlagType = config.get("flagType").toString();
 				this.flagType = Material.getMaterial(cFlagType);
 
@@ -73,7 +58,7 @@ public class Team {
 				}
 				
 				// Checking if config has been read successfully
-				if(this.name != null && this.max != null && this.flagType != null && this.spawn != null) {
+				if(this.name != null && this.flagType != null && this.spawn != null) {
 					this.players = new ArrayList<Player>();
 					// TODO initialize this.flag, this.flagLoc, this.flagItem ?
 					return true;
@@ -86,8 +71,27 @@ public class Team {
 	}
 
 	/* Team methods */
-	public void removePlayer(Player p) { players.remove(p); }
-	public void addPlayer(Player p) { players.add(p); }
+	public void removePlayer(Player p) {
+		synchronized(playersLock){
+			players.remove(p);
+		}
+	}
+	
+	/**
+	 * Add a player to this team
+	 * @param player
+	 * @return true if added false if team is full
+	 */
+	public boolean addPlayer(Player p) {
+		synchronized(playersLock){
+			// TODO Test if player is already in a team
+			if(this.players.size() >= this.ctfGame.getMax()){
+				players.add(p);
+				return true;
+			}
+			return false;
+		}
+	}
 	public ArrayList<Player> getPlayers() { return players; }
 	public boolean hasPlayer(Player p) { return players.contains(p); }
 	public void spawnPlayers() {
