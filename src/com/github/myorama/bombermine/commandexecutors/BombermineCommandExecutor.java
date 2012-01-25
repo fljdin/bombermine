@@ -66,10 +66,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 				if(args.length == 1){
 					if(player != null){
 						if(hasPlayerRights(player)){
-							Team team = this.plugin.getCtfGame().addPlayer(player);
-							if(team != null){
-								broadcast(bcColor + player.getName() + " joined the team: " + team.getName());
-							}else{
+							if(!this.plugin.getCtfGame().setPlayerTeam(player)){
 								sender.sendMessage("Teams are full");
 							}
 						}
@@ -88,9 +85,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 							if(team == null){
 								sender.sendMessage(errColor + "Team does not exist");
 							}else{
-								if(team.addPlayer(player)){
-									broadcast(bcColor + player.getName() + " joined the team: " + team.getName());
-								}else{
+								if(!this.plugin.getCtfGame().setPlayerTeam(player, team)){
 									sender.sendMessage(errColor + args[1] + "Team is full");
 								}
 							}
@@ -106,16 +101,14 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					if(hasModRights(player)){
 						Team team = plugin.getCtfGame().getTeamById(args[2]);
 						if(team == null){
-							sender.sendMessage(errColor + "Team does not exist");
+							sender.sendMessage(errColor + "Team id \"" + args[2] + "\" does not exist");
 						} else {
 							Player tPlayer = Bukkit.getServer().getPlayer(args[1]);
 							if(tPlayer == null){
 								sender.sendMessage(errColor + "Player " + args[1] + " is not online");
 							}
 							else{
-								if(team.addPlayer(tPlayer)){
-									broadcast(msgColor + args[1] + " joined the team: " + team.getName());
-								}else{
+								if(this.plugin.getCtfGame().setPlayerTeam(tPlayer, team)){
 									sender.sendMessage(errColor + "Team is full");
 								}
 							}
@@ -161,13 +154,6 @@ public class BombermineCommandExecutor implements CommandExecutor {
 			return true;
 		}else{
 			return player.hasPermission("bombermine.admin");
-		}
-	}
-	
-	private void broadcast(String msg){
-		Bukkit.getServer().getConsoleSender().sendMessage(msg);
-		for(Player player : Bukkit.getServer().getOnlinePlayers()){
-			player.sendMessage(msg);
 		}
 	}
 }

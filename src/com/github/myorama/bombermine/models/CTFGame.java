@@ -9,11 +9,12 @@ import org.bukkit.entity.Player;
 public class CTFGame {
 
 	private Map<String, Team> teams = new HashMap<String, Team>();
+	private final Object teamsLock = new Object();
 	private Bombermine plugin;
 	/**
 	 * Max player by team
 	 */
-	private Integer max = null;
+	private Integer maxTeamPlayers = null;
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
@@ -48,20 +49,20 @@ public class CTFGame {
 
 	public void initialize() {
 		// Max team size
-		Object cMax = plugin.getConfig().get("bombermine.max");
+		Object cMax = plugin.getConfig().get("bombermine.ctfgame.max_team_players");
 		if(cMax instanceof Integer) {
-			this.max = (Integer)cMax;
+			this.maxTeamPlayers = (Integer)cMax;
 		}
 		else if(cMax instanceof String) {
 			try {
-				this.max = new Integer(Integer.parseInt((String)cMax));
+				this.maxTeamPlayers = new Integer(Integer.parseInt((String)cMax));
 			}
 			catch(NumberFormatException nfe) {
-				this.max = null;
+				this.maxTeamPlayers = null;
 			}
 		}
-		if(this.max == null){
-			this.max = plugin.getConfig().getDefaults().getInt("bombermine.max");
+		if(this.maxTeamPlayers == null){
+			this.maxTeamPlayers = plugin.getConfig().getDefaults().getInt("bombermine.ctfgame.max_team_players");
 		}
 		
 		// Reading teams from config file
@@ -87,25 +88,83 @@ public class CTFGame {
 	/**
 	 * Add the player to the min sized team
 	 * @param player to add
-	 * @return Team in wich player has been added or null if 
+	 * @return true if set or false if teams are full
 	 */
-	public Team addPlayer(Player player) {
-		Team minSizedTeam = null;;
+	public boolean setPlayerTeam(Player player) {
+		return this.setPlayerTeam(player, null);
+	}
+	
+	/**
+	 * Add a player to the specific team
+	 * @param player to add
+	 * @param team team
+	 * @return true if added, false if team is full
+	 */
+	public boolean setPlayerTeam(Player player, Team team){
+		synchronized(teamsLock){
+			Team currentPlayerTeam = this.getPlayerTeam(player);
+			if(team == null){
+				// Try to find the best team to join
+				for (Map.Entry<String, Team> candidate : teams.entrySet()) {
+					if (team == null) {
+						team = candidate.getValue();
+					} else {
+						int tSize1 = team.getPlayers().size();
+						int tSize2 = candidate.getValue().getPlayers().size();
+						if(team == currentPlayerTeam){
+							tSize1--;
+						}
+						else if(candidate.getValue() == currentPlayerTeam){
+							tSize2--;
+						}
+						if(tSize1 > tSize2){ // Team candidate is better
+							team = candidate.getValue();
+						}
+					}
+				}
+			}
+			
+			if(team != null && team.getPlayers().size() < this.maxTeamPlayers){
+				if(currentPlayerTeam != null){
+					currentPlayerTeam.removePlayer(player);
+				}
+				if(team.addPlayer(player)){
+					if(currentPlayerTeam != null){
+						this.plugin.sendBroadcastMessage(player.getName() + " moved from team " + currentPlayerTeam.getName() + " to team " + team.getName());
+					}else{
+						this.plugin.sendBroadcastMessage(player.getName() + " has joined team " + team.getName());
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Get player current team
+	 * @param player
+	 * @return team or null if not in a team
+	 */
+	public Team getPlayerTeam(Player player){
+		Team playerTeam = null;
 		for (Map.Entry<String, Team> teamEntry : teams.entrySet()) {
-			if (minSizedTeam == null) {
-				minSizedTeam = teamEntry.getValue();
-			} else {
-				if(minSizedTeam.getPlayers().size() > teamEntry.getValue().getPlayers().size()){
-					minSizedTeam = teamEntry.getValue();
+			for(Player tPlayer : teamEntry.getValue().getPlayers()){
+				if(tPlayer == player){
+					playerTeam = teamEntry.getValue();
+					break;
 				}
 			}
 		}
-		if(minSizedTeam != null){
-			if(!minSizedTeam.addPlayer(player)){
-				minSizedTeam = null;
-			}
+		return playerTeam;
+	}
+	
+	public boolean removePlayer(Player player){
+		synchronized(teamsLock){
+			Team currentTeam = this.getPlayerTeam(player);
+			this.plugin.sendBroadcastMessage(player.getName() + " has left his team (" + currentTeam.getName() + ")");
+			return currentTeam.removePlayer(player);
 		}
-		return minSizedTeam;
 	}
 	
 	/**
@@ -113,6 +172,6 @@ public class CTFGame {
 	 * @return max players
 	 */
 	public Integer getMax(){
-		return this.max;
+		return this.maxTeamPlayers;
 	}
 }

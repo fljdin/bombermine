@@ -9,10 +9,13 @@ import com.github.myorama.bombermine.models.Traps;
 
 import java.io.File;
 import java.util.logging.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -68,5 +71,12 @@ public class Bombermine extends JavaPlugin {
 	
 	public CTFGame getCtfGame(){
 		return this.ctfGame;
+	}
+	
+	public void sendBroadcastMessage(String msg){
+		Bukkit.getServer().getConsoleSender().sendMessage(msg);
+		for(Player player : Bukkit.getServer().getOnlinePlayers()){
+			player.sendMessage(ChatColor.GOLD + msg);
+		}
 	}
 }

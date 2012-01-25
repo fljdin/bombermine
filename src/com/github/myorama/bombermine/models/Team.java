@@ -15,7 +15,6 @@ public class Team {
 	private String name = null;
 	private Location spawn = null;
 	private ArrayList<Player> players = null;
-	private final Object playersLock = new Object();
 
 	private Block flag = null;
 	private Location flagLoc = null;
@@ -70,28 +69,24 @@ public class Team {
 		return false;
 	}
 
-	/* Team methods */
-	public void removePlayer(Player p) {
-		synchronized(playersLock){
-			players.remove(p);
-		}
+	/**
+	 * Remove the specified player from tis team
+	 * @param player
+	 * @return true if added
+	 */
+	public boolean removePlayer(Player player) {
+		return players.remove(player);
 	}
 	
 	/**
-	 * Add a player to this team
+	 * Add a player to this team. It does not check if player is already in
 	 * @param player
-	 * @return true if added false if team is full
+	 * @return true if added
 	 */
 	public boolean addPlayer(Player p) {
-		synchronized(playersLock){
-			// TODO Test if player is already in a team
-			if(this.players.size() >= this.ctfGame.getMax()){
-				players.add(p);
-				return true;
-			}
-			return false;
-		}
+		return players.add(p);
 	}
+	
 	public ArrayList<Player> getPlayers() { return players; }
 	public boolean hasPlayer(Player p) { return players.contains(p); }
 	public void spawnPlayers() {
