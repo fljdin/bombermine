@@ -10,3 +10,7 @@ bombermine:
     spawn: world/0/0/0
     max: 5
     flagType: IRON_ORE
+
+  faster:
+    materials: [BRICK,BRICK_STAIRS]
+    acceleration: 1.4
