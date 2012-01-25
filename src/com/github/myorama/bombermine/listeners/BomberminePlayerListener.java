@@ -1,5 +1,8 @@
 package com.github.myorama.bombermine.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.myorama.bombermine.Bombermine;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,9 +21,21 @@ import org.bukkit.util.Vector;
 public class BomberminePlayerListener extends PlayerListener {
 
 	public Bombermine plugin;
+	
+	protected double acceleration;
+	protected List<Integer> magicBlocs = new ArrayList<Integer>();
 
 	public BomberminePlayerListener(Bombermine instance) {
 		plugin = instance;
+		
+		// Faster sprint initialize
+		acceleration = plugin.getConfig().getDouble("bombermine.faster.acceleration");
+		List<String> blocs = plugin.getConfig().getStringList("bombermine.faster.materials");
+		for (String b : blocs) {
+			Material bloc = Material.getMaterial(b);
+			if (bloc != null)
+				magicBlocs.add(bloc.getId());
+		}
 	}
 
 	@Override
@@ -35,15 +50,15 @@ public class BomberminePlayerListener extends PlayerListener {
 		if (plugin.getTraps().isTrapped(loc)) {
 			plugin.getTraps().explode(loc);
 			plugin.getTraps().removeTrap(loc);
-			event.getPlayer().sendMessage(ChatColor.RED + "You walk on an explosive trap! BOOM!");
+			//event.getPlayer().sendMessage(ChatColor.RED + "You walk on an explosive trap! BOOM!");
 		}
 		
 		/**
-		 * Road accelerators
+		 * Faster sprint
 		 */
-		if (loc.getBlock().getTypeId() == Material.BRICK.getId()) {
-			Vector vec = player.getLocation().getDirection().multiply(1.3);
-            vec.setY(vec.getY()/1.5);
+		if (magicBlocs.contains(loc.getBlock().getTypeId()) && player.isSprinting()) {
+			Vector vec = player.getLocation().getDirection().multiply(acceleration);
+            vec.setY(0.1); // reduce super jump
             player.setVelocity(vec);
 		}
 	}
