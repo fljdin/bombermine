@@ -14,5 +14,5 @@ bombermine:
     flagType: IRON_ORE
 
   faster:
-    materials: [BRICK,BRICK_STAIRS]
+    materials: [BRICK]
     acceleration: 1.4

@@ -31,6 +31,7 @@ public class BomberminePlayerListener extends PlayerListener {
 		// Faster sprint initialize
 		acceleration = plugin.getConfig().getDouble("bombermine.faster.acceleration");
 		List<String> blocs = plugin.getConfig().getStringList("bombermine.faster.materials");
+		
 		for (String b : blocs) {
 			Material bloc = Material.getMaterial(b);
 			if (bloc != null)
@@ -41,7 +42,7 @@ public class BomberminePlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 		
-		Location loc = event.getTo().add(0, -1, 0);
+		Location loc = event.getTo().add(0, -0.5, 0);
 		Player player = event.getPlayer();
 		
 		/**
@@ -50,7 +51,6 @@ public class BomberminePlayerListener extends PlayerListener {
 		if (plugin.getTraps().isTrapped(loc)) {
 			plugin.getTraps().explode(loc);
 			plugin.getTraps().removeTrap(loc);
-			//event.getPlayer().sendMessage(ChatColor.RED + "You walk on an explosive trap! BOOM!");
 		}
 		
 		/**
@@ -70,15 +70,14 @@ public class BomberminePlayerListener extends PlayerListener {
 		 */
 		if (event.getMaterial() == Material.SULPHUR && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = event.getClickedBlock();
-			// if there is something up the block the player cannot add a trap
-			if (clickedBlock.getRelative(BlockFace.UP, 1).getTypeId() != Material.AIR.getId()) {
-				event.getPlayer().sendMessage(ChatColor.RED + "You cannot drop an explosive trap underground");
-			} else {
+			// player can only place a trap on uncovered bloc
+			if (clickedBlock.getRelative(BlockFace.UP, 1).getType() == Material.AIR) {
 				// new trap location
-				if (plugin.getTraps().addTrap(clickedBlock.getLocation())) {
+				boolean trapped = plugin.getTraps().addTrap(clickedBlock.getLocation());
+				if (trapped) {
 					// remove one sulphur on hand
 					int amount = event.getPlayer().getItemInHand().getAmount();
-					event.getPlayer().setItemInHand(new ItemStack(Material.SULPHUR.getId(), amount - 1));
+					event.getPlayer().setItemInHand(new ItemStack(Material.SULPHUR, amount - 1));
 					event.getPlayer().sendMessage(ChatColor.RED + "You drop an explosive trap!");					
 				}
 			}
