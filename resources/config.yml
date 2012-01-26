@@ -6,13 +6,11 @@ bombermine:
   - id: red
     name: Equipe des rouges
     spawn: world/0/0/0
-    max: 5
     flagType: IRON_ORE
     flagLoc: world/0/0/0
   - id: blue
     name: Equipe des bleus
     spawn: world/0/0/0
-    max: 5
     flagType: IRON_ORE
     flagLoc: world/0/0/0
   faster:

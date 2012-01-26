@@ -30,8 +30,11 @@ public class TrapListener implements Listener {
 	 */
 	@EventHandler
 	public void trapExplosion(PlayerMoveEvent event){
+		// TODO works during game only
 		Location loc = event.getTo().add(0, -0.5, 0);
-		if (plugin.getTraps().isTrapped(loc)) {
+		String team = plugin.getCtfGame().getPlayerTeamId(event.getPlayer());
+		
+		if (plugin.getTraps().isTeamTrapped(loc, team)) {
 			plugin.getTraps().explode(loc);
 		}
 	}
@@ -41,7 +44,7 @@ public class TrapListener implements Listener {
 	 * @param event 
 	 */
 	@EventHandler
-	public  void noExplosionDrops(EntityExplodeEvent event){
+	public void noExplosionDrops(EntityExplodeEvent event){
 		List<Block> wouldExplode = event.blockList();
 		for (Block block : wouldExplode) {
 			block.setType(Material.AIR);
@@ -60,11 +63,17 @@ public class TrapListener implements Listener {
 	@EventHandler
 	public void addTrap(PlayerInteractEvent event){
 		if (event.getMaterial() == Material.SULPHUR && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			
+			String team = plugin.getCtfGame().getPlayerTeamId(event.getPlayer());
+			if (team == null) return; // only players on team can use traps
+			
 			Block clickedBlock = event.getClickedBlock();
 			// player can only place a trap on uncovered bloc
 			if (clickedBlock.getRelative(BlockFace.UP, 1).getType() == Material.AIR) {
-				// new trap location
-				boolean trapped = plugin.getTraps().addTrap(clickedBlock.getLocation());
+				
+				// new trap team associated location
+				boolean trapped = plugin.getTraps().addTrap(team, clickedBlock.getLocation());
+				
 				if (trapped) {
 					// remove one sulphur on hand
 					int amount = event.getPlayer().getItemInHand().getAmount();

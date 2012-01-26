@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Location;
 
@@ -21,7 +23,7 @@ public class Traps {
 	
 	private File file;
 	private String traps;
-	private float power = 2F;
+	private float power = 3F;
 	
 	public Traps(File f) {
 		this.file = f;
@@ -30,6 +32,14 @@ public class Traps {
 		if (traps == null) {
 			traps = "#";
 		}
+	}
+	
+	/**
+	 * Clear all trap locations
+	 */
+	public void clear() {
+		traps = "#";
+		save();
 	}
 	
 	/**
@@ -78,10 +88,10 @@ public class Traps {
 	 */
 	protected void save() {
 		save(file);
-	}	
+	}
 	
 	protected String formatLocation(Location loc, String team) {
-		return formatLocation(loc) + team;
+		return formatLocation(loc) + team.toLowerCase();
 	}
 	
 	protected String formatLocation(Location loc) {
@@ -102,12 +112,37 @@ public class Traps {
 	}
 	
 	/**
-	 * Memorize trap coordinates
-	 * @param trap location
+	 * Method to know if the block is trapped for a specific player team
+	 * @param Location of block
+	 * @param Team id
+	 * @return true or false
 	 */
-	public boolean addTrap(Location loc) {
+	public boolean isTeamTrapped(Location loc, String team) {
+		Pattern p = Pattern.compile(formatLocation(loc)+"(\\w+)");
+		Matcher m = p.matcher(traps);
+		
+		// no trap found
+		if (!m.find()) return false;
+
+		// get trap owner team and compare
+		String ownerTeam = m.group(1);
+		if (ownerTeam.equals(team)) {
+			return false;
+		}
+		
+		// it's a trap!
+		return true;
+	}
+	
+	/**
+	 * Memorize trap coordinates
+	 * @param player team
+	 * @param location
+	 * @return placed or not
+	 */
+	public boolean addTrap(String team, Location loc) {
 		if (!isTrapped(loc)) {
-			traps += formatLocation(loc);
+			traps += formatLocation(loc, team);
 			save();
 			return true;
 		}
@@ -120,7 +155,8 @@ public class Traps {
 	 */
 	public boolean removeTrap(Location loc) {
 		if (isTrapped(loc)) {
-			traps = traps.replace(formatLocation(loc), "");
+			// Remove coords + team name
+			traps = traps.replaceAll(formatLocation(loc)+"\\w+", "");
 			save();
 			return true;
 		}

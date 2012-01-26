@@ -11,6 +11,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
+/**
+ * @author myorama
+ * 
+ * @category Gameplay
+ * @version 0.1
+ */
 public class AccelerationListener implements Listener {
 
 	private Bombermine plugin;

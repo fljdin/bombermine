@@ -165,6 +165,24 @@ public class CTFGame {
 		return playerTeam;
 	}
 	
+	/**
+	 * Get id of player current team
+	 * @param player
+	 * @return id or null if not in a team
+	 */
+	public String getPlayerTeamId(Player player) {
+		String id = null;
+		for (Map.Entry<String, Team> teamEntry : teams.entrySet()) {
+			for(Player tPlayer : teamEntry.getValue().getPlayers()){
+				if(tPlayer == player){
+					id = teamEntry.getKey();
+					break;
+				}
+			}
+		}
+		return id;
+	}
+	
 	public boolean removePlayer(Player player){
 		synchronized(teamsLock){
 			Team currentTeam = this.getPlayerTeam(player);
