@@ -1,3 +1,12 @@
 --------------------------------
 --- BOMBERMINE Bukkit plugin ---
 --------------------------------
+
+VERSION 0.1
+	Game:
+	* Join a team manualy or with autobalance
+	* Cooldown respawn
+	
+	Features:
+	* Explosives Traps with chaining
+	* Sprint accelerator blocs
