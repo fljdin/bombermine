@@ -2,17 +2,18 @@ bombermine:
   ctfgame:
     max_team_players: 5
     respawn_cooldown: 10
+    default_spawn: world/0/0/0
   teams:
   - id: red
     name: Equipe des rouges
     spawn: world/0/0/0
-    flagType: IRON_ORE
-    flagLoc: world/0/0/0
+    flag_type: IRON_ORE
+    flag_loc: world/0/0/0
   - id: blue
     name: Equipe des bleus
     spawn: world/0/0/0
-    flagType: IRON_ORE
-    flagLoc: world/0/0/0
+    flag_type: IRON_ORE
+    flag_loc: world/0/0/0
   faster:
     materials: [BRICK]
     acceleration: 1.4

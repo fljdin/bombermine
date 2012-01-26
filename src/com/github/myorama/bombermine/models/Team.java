@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public class Team {
 	private CTFGame ctfGame;
 	
+	private String id = null;
 	private String name = null;
 	private Location spawn = null;
 	private ArrayList<Player> players = null;
@@ -39,8 +40,9 @@ public class Team {
 	{
 		if(config != null){
 			try {
+				this.id = (String)config.get("id");
 				this.name = (String)config.get("name");
-				String cFlagType = config.get("flagType").toString();
+				String cFlagType = config.get("flag_type").toString();
 				this.flagType = Material.getMaterial(cFlagType);
 
 				String[] coords = config.get("spawn").toString().split("/");
@@ -56,7 +58,7 @@ public class Team {
 					}
 				}
 				
-				coords = config.get("flagLoc").toString().split("/");
+				coords = config.get("flag_loc").toString().split("/");
 				if(coords.length > 0) {
 					World world = this.ctfGame.getPlugin().getServer().getWorld(coords[0]);
 					if(world != null){
@@ -67,7 +69,7 @@ public class Team {
 				}
 				
 				// Checking if config has been read successfully
-				if(this.name != null && this.flagType != null && this.spawn != null && flagLoc != null) {
+				if(this.id != null && this.name != null && this.flagType != null && this.spawn != null && flagLoc != null) {
 					this.players = new ArrayList<Player>();
 					// TODO initialize this.flag, this.flagItem
 					return true;
@@ -109,8 +111,26 @@ public class Team {
 	public String getName() { return name; }
 
 	public Location getSpawnLoc() { return spawn; }
-	public void setSpawnLoc(Location s) { spawn = s; }
 	
+	public void setSpawnLoc(Location location) {
+		this.spawn = location;
+		
+		// Location config format: world/x/y/z/yaw/pitch
+		StringBuilder sb = new StringBuilder();
+		sb.append(location.getWorld().getName());
+		sb.append("/");
+		sb.append(location.getX());
+		sb.append("/");
+		sb.append(location.getY());
+		sb.append("/");
+		sb.append(location.getZ());
+		sb.append("/");
+		sb.append(location.getYaw());
+		sb.append("/");
+		sb.append(location.getPitch());
+		
+		this.ctfGame.saveTeamConfig(this.id, "spawn", sb.toString());
+	}
 	public Block getFlag() { return flag; }
 	public void setFlag(Block b) { flag = b; }
 
@@ -122,5 +142,4 @@ public class Team {
 
 	public Material getFlagType() { return flagType; }
 	public void setFlagType(Material ft) { flagType = ft; }
-
 }

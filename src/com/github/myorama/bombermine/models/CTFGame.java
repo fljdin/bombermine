@@ -4,8 +4,9 @@ import com.github.myorama.bombermine.Bombermine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class CTFGame {
@@ -20,6 +21,7 @@ public class CTFGame {
 	 * Max player by team
 	 */
 	private Integer maxTeamPlayers = null;
+	private Location defaultSpawn = null;
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
@@ -84,6 +86,20 @@ public class CTFGame {
 					} else {
 						Bombermine.log.warning(String.format("Team with id %s failed to load.", id));
 					}
+				}
+			}
+		}
+		
+		// Initialize default spawn location
+		String[] coords = this.plugin.getConfig().get("bombermine.ctfgame.default_spawn").toString().split("/");
+		if(coords.length > 0) {
+			World world = this.plugin.getServer().getWorld(coords[0]);
+			if(world != null){
+				if(coords.length == 4) {
+					this.defaultSpawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
+				}
+				else if(coords.length == 6) {
+					this.defaultSpawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
 				}
 			}
 		}
@@ -227,5 +243,46 @@ public class CTFGame {
 	 */
 	public Integer getMax(){
 		return this.maxTeamPlayers;
+	}
+	
+	/**
+	 * Set default spawn for players who are not in a team
+	 * @param location 
+	 */
+	public void setDefaultSpawn(Location location){
+		this.defaultSpawn = location;
+		
+		// Location config format: world/x/y/z/yaw/pitch
+		StringBuilder sb = new StringBuilder();
+		sb.append(location.getWorld().getName());
+		sb.append("/");
+		sb.append(location.getX());
+		sb.append("/");
+		sb.append(location.getY());
+		sb.append("/");
+		sb.append(location.getZ());
+		sb.append("/");
+		sb.append(location.getYaw());
+		sb.append("/");
+		sb.append(location.getPitch());
+		this.plugin.getConfig().set("bombermine.ctfgame.default_spawn", sb.toString());
+		this.plugin.saveConfig();
+	}
+	
+	public void saveTeamConfig(String id, String key, String value){
+		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
+		for (Map<String, Object> teamConfigMap : configTeams) {
+			if (teamConfigMap instanceof Map) {
+				String cfgId = (String) teamConfigMap.get("id");
+				if (id != null) {
+					if(cfgId.equals(id)){
+						teamConfigMap.remove(key);
+						teamConfigMap.put(key, value);
+					}
+				}
+			}
+		}
+		this.plugin.getConfig().set("bombermine.teams", configTeams);
+		this.plugin.saveConfig();
 	}
 }
