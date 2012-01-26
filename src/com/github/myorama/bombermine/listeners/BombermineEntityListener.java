@@ -10,12 +10,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 
-/**
- *
- * @author Nittero
- */
+@Deprecated
 public class BombermineEntityListener extends EntityListener{
-	public Bombermine plugin;
+	private Bombermine plugin;
 	
 	public BombermineEntityListener(Bombermine instance) {
 		plugin = instance;

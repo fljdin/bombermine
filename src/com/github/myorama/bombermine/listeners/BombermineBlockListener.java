@@ -1,14 +1,14 @@
 package com.github.myorama.bombermine.listeners;
 
 import com.github.myorama.bombermine.Bombermine;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 
+@Deprecated
 public class BombermineBlockListener extends BlockListener {
-	public Bombermine plugin;
+	private Bombermine plugin;
 	
 	public BombermineBlockListener(Bombermine instance) {
 		plugin = instance;

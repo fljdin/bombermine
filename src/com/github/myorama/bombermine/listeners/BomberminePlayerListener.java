@@ -1,9 +1,8 @@
 package com.github.myorama.bombermine.listeners;
 
+import com.github.myorama.bombermine.Bombermine;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.github.myorama.bombermine.Bombermine;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,9 +17,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+@Deprecated
 public class BomberminePlayerListener extends PlayerListener {
 
-	public Bombermine plugin;
+	private Bombermine plugin;
 	
 	protected double acceleration;
 	protected List<Integer> magicBlocs = new ArrayList<Integer>();
