@@ -13,7 +13,9 @@ public class CTFGame {
 	private Map<String, Team> teams = new HashMap<String, Team>();
 	private Map<String, Long> cooldown = new HashMap<String, Long>();
 	private final Object teamsLock = new Object();
+	private Long seconds;
 	private Bombermine plugin;
+	
 	/**
 	 * Max player by team
 	 */
@@ -21,6 +23,7 @@ public class CTFGame {
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
+		seconds = plugin.getConfig().getLong("bombermine.ctfgame.respawn_cooldown");
 	}
 
 	public Bombermine getPlugin() {
@@ -176,7 +179,7 @@ public class CTFGame {
 	 */
 	public void addCooldown(Player p) {
 		cooldown.put(p.getName(), System.currentTimeMillis());
-		p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+cooldown+" seconds.");
+		p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+seconds+" seconds.");
 	}
 	
 	/**
@@ -189,12 +192,11 @@ public class CTFGame {
 		try {
 			Long time = cooldown.get(p.getName());
 			Long now = System.currentTimeMillis();
-			Long seconds = plugin.getConfig().getLong("bombermine.ctfgame.respawn_cooldown");
 			
-			if ((now - time) < seconds*100) {
+			if ((now - time) < seconds*1000) {
 				return true;
 			}
-			cooldown.remove(p);
+			cooldown.remove(p.getName());
 			
 		} catch (NullPointerException e) { }
 		
