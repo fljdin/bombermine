@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -34,7 +33,6 @@ public class TrapListener implements Listener {
 		Location loc = event.getTo().add(0, -0.5, 0);
 		if (plugin.getTraps().isTrapped(loc)) {
 			plugin.getTraps().explode(loc);
-			plugin.getTraps().removeTrap(loc);
 		}
 	}
 	

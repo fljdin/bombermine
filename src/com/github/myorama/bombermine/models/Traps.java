@@ -133,5 +133,6 @@ public class Traps {
 	 */
 	public void explode(Location loc) {
 		loc.getWorld().createExplosion(loc, power);
+		removeTrap(loc);
 	}
 }

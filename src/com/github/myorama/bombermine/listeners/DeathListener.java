@@ -38,7 +38,17 @@ public class DeathListener implements Listener {
 	@EventHandler
 	public void respawnTime(PlayerMoveEvent event){
 		if (plugin.getCtfGame().isCooldowned(event.getPlayer())) {
-			event.setTo(event.getFrom());
+			Location to = event.getTo();
+			Location from = event.getFrom();
+			
+			String currentPos = String.format("%.4f=%.4f", from.getX(), from.getZ());
+			String limitPos = String.format("%.4f=%.4f", to.getX(), to.getZ());
+			
+			if (!limitPos.equals(currentPos)) {
+				from.setYaw(to.getYaw());
+				from.setPitch(to.getPitch());
+				event.setTo(from.add(0,0.5,0));
+			}
 		}
 	}
 }
