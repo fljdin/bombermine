@@ -56,10 +56,20 @@ public class Team {
 					}
 				}
 				
+				coords = config.get("flagLoc").toString().split("/");
+				if(coords.length > 0) {
+					World world = this.ctfGame.getPlugin().getServer().getWorld(coords[0]);
+					if(world != null){
+						if(coords.length == 4) {
+							this.flagLoc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
+						}
+					}
+				}
+				
 				// Checking if config has been read successfully
-				if(this.name != null && this.flagType != null && this.spawn != null) {
+				if(this.name != null && this.flagType != null && this.spawn != null && flagLoc != null) {
 					this.players = new ArrayList<Player>();
-					// TODO initialize this.flag, this.flagLoc, this.flagItem ?
+					// TODO initialize this.flag, this.flagItem
 					return true;
 				}
 			} catch (Exception e) {
