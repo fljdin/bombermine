@@ -1,14 +1,27 @@
 package com.github.myorama.bombermine.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.myorama.bombermine.Bombermine;
+import com.github.myorama.bombermine.models.Team;
+
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 
+/**
+ * @author myorama
+ *
+ * @category Game
+ * @version 0.1
+ */
 public class DeathListener implements Listener {
 
 	private Bombermine plugin;
@@ -25,9 +38,23 @@ public class DeathListener implements Listener {
 	public void respawnCooldown(EntityDeathEvent event){
 		// TODO log killer name for scoring
 		Entity e = event.getEntity();
+		
 		if (e instanceof Player) {
-			event.getDrops().clear();
-			plugin.getCtfGame().addCooldown((Player)e);
+			Team t = plugin.getCtfGame().getPlayerTeam((Player)e);
+			
+			if (t != null) {
+				// Drop only flags if presents
+				List<ItemStack> flags = new ArrayList<ItemStack>();
+				for (ItemStack item : event.getDrops()) {
+					if (item.getType() == Material.WOOL) {
+						flags.add(item);
+					}
+				}				
+				event.getDrops().retainAll(flags);
+
+				// Start cooldown for this player
+				plugin.getCtfGame().addCooldown((Player)e);				
+			}			
 		}
 	}
 	

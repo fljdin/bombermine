@@ -34,8 +34,7 @@ public class SpawnListener implements Listener {
 		Location home = plugin.getCtfGame().getDefaultSpawn();
 		
 		// Check if spawn is solid block and if player is new
-		if (home.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR
-				&& event.getPlayer().getLastPlayed() == 0) {
+		if (isSpawnable(home) && event.getPlayer().getLastPlayed() == 0) {
 			event.getPlayer().teleport(home);
 		}
 	}
@@ -47,10 +46,21 @@ public class SpawnListener implements Listener {
 	@EventHandler
 	public void respawnPlayer(PlayerRespawnEvent event) {
 		Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
-
+		if (team == null) return;
+				
 		// TODO detect if game is started
-		if (team != null) {
-			event.setRespawnLocation(team.getSpawnLoc());			
+		Location spawn = team.getSpawnLoc();
+		if (isSpawnable(spawn)) {
+			event.setRespawnLocation(spawn);			
 		}
+	}
+	
+	/**
+	 * Check if location is on a solid block
+	 * @param location
+	 * @return true or false
+	 */
+	protected boolean isSpawnable(Location loc) {
+		return loc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR;
 	}
 }
