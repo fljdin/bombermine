@@ -82,7 +82,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 				else if (args.length == 2) { // join <team>
 					if(player != null){
 						if(hasPlayerRights(player)){
-							Team team = plugin.getCtfGame().getTeamById(args[1]);
+							Team team = plugin.getCtfGame().getTeamByColor(args[1]);
 							if(team == null){
 								sender.sendMessage(errColor + "Team does not exist");
 							}else{
@@ -100,7 +100,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					}
 				} else if (args.length == 3) { // join <player> <team>
 					if(hasModRights(player)){
-						Team team = plugin.getCtfGame().getTeamById(args[2]);
+						Team team = plugin.getCtfGame().getTeamByColor(args[2]);
 						if(team != null){
 							Player tPlayer = Bukkit.getServer().getPlayer(args[1]);
 							if(tPlayer != null){
@@ -157,7 +157,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 						if(player != null){
 							if(hasAdminRights(player)){
 								if(args.length == 3){ // team spawn <team>
-									Team team = this.plugin.getCtfGame().getTeamById(args[2]);
+									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
 									if(team != null){
 										team.setSpawnLoc(player.getLocation());
 										sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
