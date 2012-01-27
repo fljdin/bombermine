@@ -40,17 +40,17 @@ public class CTFGame {
 	}
 
 	/**
-	 * Get a team by its id
+	 * Get a team by its color
 	 *
-	 * @param id
-	 * @return Team or null if id is not found
+	 * @param color
+	 * @return Team or null if color is not found
 	 */
-	public Team getTeamById(String id) {
-		return teams.get(id);
+	public Team getTeamByColor(String color) {
+		return teams.get(color.toUpperCase());
 	}
 
-	public void addNewTeam(String id, Team team) {
-		teams.put(id, team);
+	public void addNewTeam(String color, Team team) {
+		teams.put(color.toUpperCase(), team);
 	}
 
 	public void initialize() {
@@ -76,13 +76,13 @@ public class CTFGame {
 		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
 		for (Map<String, Object> teamConfigMap : configTeams) {
 			if (teamConfigMap instanceof Map) {
-				String id = (String) teamConfigMap.get("id");
-				if (id != null) {
+				String color = (String) teamConfigMap.get("color");
+				if (color != null) {
 					Team cTeam = new Team(this);
 					if (cTeam.initialize(teamConfigMap)) {
-						this.teams.put(id, cTeam);
+						this.teams.put(color, cTeam);
 					} else {
-						Bombermine.log.warning(String.format("Team with id %s failed to load.", id));
+						Bombermine.log.warning(String.format("Team with color %s failed to load.", color));
 					}
 				}
 			}
@@ -163,24 +163,6 @@ public class CTFGame {
 			}
 		}
 		return playerTeam;
-	}
-	
-	/**
-	 * Get id of player current team
-	 * @param player
-	 * @return id or null if not in a team
-	 */
-	public String getPlayerTeamId(Player player) {
-		String id = null;
-		for (Map.Entry<String, Team> teamEntry : teams.entrySet()) {
-			for(Player tPlayer : teamEntry.getValue().getPlayers()){
-				if(tPlayer == player){
-					id = teamEntry.getKey();
-					break;
-				}
-			}
-		}
-		return id;
 	}
 	
 	public boolean removePlayer(Player player){

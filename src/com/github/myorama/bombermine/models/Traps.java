@@ -114,11 +114,11 @@ public class Traps {
 	/**
 	 * Method to know if the block is trapped for a specific player team
 	 * @param Location of block
-	 * @param Team id
+	 * @param Team color
 	 * @return true or false
 	 */
-	public boolean isTeamTrapped(Location loc, String team) {
-		Pattern p = Pattern.compile(formatLocation(loc)+"(\\w+)");
+	public boolean isTeamTrapped(Location loc, String colorTeam) {
+		Pattern p = Pattern.compile(formatLocation(loc)+"(\\W+)");
 		Matcher m = p.matcher(traps);
 		
 		// no trap found
@@ -126,7 +126,7 @@ public class Traps {
 
 		// get trap owner team and compare
 		String ownerTeam = m.group(1);
-		if (ownerTeam.equals(team)) {
+		if (ownerTeam.equals(colorTeam)) {
 			return false;
 		}
 		

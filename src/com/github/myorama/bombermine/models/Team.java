@@ -2,24 +2,22 @@ package com.github.myorama.bombermine.models;
 
 import java.util.ArrayList;
 import java.util.Map;
+
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Wool;
 
 public class Team {
 	private CTFGame ctfGame;
 	
+	private String color = null;
 	private String name = null;
 	private Location spawn = null;
 	private ArrayList<Player> players = null;
 
-	private Block flag = null;
+	private Wool flag = null;
 	private Location flagLoc = null;
-	private Material flagType = null;
-	private ItemStack flagItem = null;
 
 	/**
 	 * Constructor with CTFGame instance
@@ -39,9 +37,8 @@ public class Team {
 	{
 		if(config != null){
 			try {
+				this.color = ((String)config.get("color")).toUpperCase();
 				this.name = (String)config.get("name");
-				String cFlagType = config.get("flagType").toString();
-				this.flagType = Material.getMaterial(cFlagType);
 
 				String[] coords = config.get("spawn").toString().split("/");
 				if(coords.length > 0) {
@@ -67,7 +64,7 @@ public class Team {
 				}
 				
 				// Checking if config has been read successfully
-				if(this.name != null && this.flagType != null && this.spawn != null && flagLoc != null) {
+				if(this.name != null && this.spawn != null && flagLoc != null) {
 					this.players = new ArrayList<Player>();
 					// TODO initialize this.flag, this.flagItem
 					return true;
@@ -105,22 +102,21 @@ public class Team {
 		}
 	}
 	
+	public boolean isTeamFlag(Wool wool) {
+		return wool.getColor().toString().equals(color);
+	}
+	
 	/* Accessors */
+	public String getColor() { return color; }
 	public String getName() { return name; }
 
 	public Location getSpawnLoc() { return spawn; }
 	public void setSpawnLoc(Location s) { spawn = s; }
 	
-	public Block getFlag() { return flag; }
-	public void setFlag(Block b) { flag = b; }
-
-	public ItemStack getFlagItem() { return flagItem; }
-	public void setFlagItem(ItemStack f) { flagItem = f; }
+	public Wool getFlag() { return flag; }
+	public void setFlag(Wool w) { flag = w; }
 
 	public Location getFlagLoc() { return flagLoc; }
 	public void setFlagLoc(Location fl) { flagLoc = fl;	}
-
-	public Material getFlagType() { return flagType; }
-	public void setFlagType(Material ft) { flagType = ft; }
 
 }

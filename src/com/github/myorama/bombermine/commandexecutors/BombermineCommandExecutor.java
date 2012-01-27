@@ -39,7 +39,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 
 		ChatColor msgColor = ChatColor.GREEN;
 		ChatColor errColor = ChatColor.RED;
-		ChatColor bcColor = ChatColor.GOLD;
+		//ChatColor bcColor = ChatColor.GOLD;
 
 		// TODO a simplifier (permissions user/moderator/admin)
 		
@@ -81,7 +81,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 				else if (args.length == 2) { // join <team>
 					if(player != null){
 						if(hasPlayerRights(player)){
-							Team team = plugin.getCtfGame().getTeamById(args[1]);
+							Team team = plugin.getCtfGame().getTeamByColor(args[1]);
 							if(team == null){
 								sender.sendMessage(errColor + "Team does not exist");
 							}else{
@@ -99,7 +99,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					}
 				} else if (args.length == 3) { // join <player> <team>
 					if(hasModRights(player)){
-						Team team = plugin.getCtfGame().getTeamById(args[2]);
+						Team team = plugin.getCtfGame().getTeamByColor(args[2]);
 						if(team != null){
 							Player tPlayer = Bukkit.getServer().getPlayer(args[1]);
 							if(tPlayer != null){
@@ -117,7 +117,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 						sender.sendMessage(ERROR_UNAUTHORIZED);
 					}
 				} else {
-					if(player == null){
+					if(player != null){
 						if(hasModRights(player)){
 							player.sendMessage(msgColor + "/bm join | join [player] <team>");
 						}else if(hasPlayerRights(player)){

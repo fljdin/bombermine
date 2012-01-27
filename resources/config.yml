@@ -3,15 +3,13 @@ bombermine:
     max_team_players: 5
     respawn_cooldown: 10
   teams:
-  - id: red
+  - color: RED
     name: Equipe des rouges
     spawn: world/0/0/0
-    flagType: IRON_ORE
     flagLoc: world/0/0/0
-  - id: blue
+  - color: BLUE
     name: Equipe des bleus
     spawn: world/0/0/0
-    flagType: IRON_ORE
     flagLoc: world/0/0/0
   faster:
     materials: [BRICK]

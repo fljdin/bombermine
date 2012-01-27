@@ -1,6 +1,8 @@
 package com.github.myorama.bombermine.listeners;
 
 import com.github.myorama.bombermine.Bombermine;
+import com.github.myorama.bombermine.models.Team;
+
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -32,9 +34,13 @@ public class TrapListener implements Listener {
 	public void trapExplosion(PlayerMoveEvent event){
 		// TODO works during game only
 		Location loc = event.getTo().add(0, -0.5, 0);
-		String team = plugin.getCtfGame().getPlayerTeamId(event.getPlayer());
+		Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
 		
-		if (plugin.getTraps().isTeamTrapped(loc, team)) {
+		// Bug fix if team is null
+		String color = null;
+		if (team != null) color = team.getColor();
+		
+		if (plugin.getTraps().isTeamTrapped(loc, color)) {
 			plugin.getTraps().explode(loc);
 		}
 	}
@@ -64,7 +70,7 @@ public class TrapListener implements Listener {
 	public void addTrap(PlayerInteractEvent event){
 		if (event.getMaterial() == Material.SULPHUR && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			
-			String team = plugin.getCtfGame().getPlayerTeamId(event.getPlayer());
+			Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
 			if (team == null) return; // only players on team can use traps
 			
 			Block clickedBlock = event.getClickedBlock();
@@ -72,7 +78,7 @@ public class TrapListener implements Listener {
 			if (clickedBlock.getRelative(BlockFace.UP, 1).getType() == Material.AIR) {
 				
 				// new trap team associated location
-				boolean trapped = plugin.getTraps().addTrap(team, clickedBlock.getLocation());
+				boolean trapped = plugin.getTraps().addTrap(team.getColor(), clickedBlock.getLocation());
 				
 				if (trapped) {
 					// remove one sulphur on hand
@@ -86,7 +92,7 @@ public class TrapListener implements Listener {
 	
 	/**
 	 * Defuse trap on BlockBreakEvent
-	 * @param event 
+	 * @param event
 	 */
 	@EventHandler
 	public void defuseTrap(BlockBreakEvent event){
