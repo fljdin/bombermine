@@ -11,17 +11,13 @@ import org.bukkit.entity.Player;
 
 public class CTFGame {
 
+	private Bombermine plugin;
 	private Map<String, Team> teams = new HashMap<String, Team>();
 	private Map<String, Long> cooldown = new HashMap<String, Long>();
 	private final Object teamsLock = new Object();
-	private Long seconds;
-	private Bombermine plugin;
-	
-	/**
-	 * Max player by team
-	 */
 	private Integer maxTeamPlayers = null;
-	private Location defaultSpawn = null;
+	private World world = null;
+	private Long seconds;
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
@@ -56,9 +52,12 @@ public class CTFGame {
 	}
 	
 	public Location getDefaultSpawn() {
-		return this.defaultSpawn;
+		return this.world.getSpawnLocation();
 	}
 
+	/**
+	 * Read and parse teams configuration
+	 */
 	public void initialize() {
 		// Max team size
 		Object cMax = plugin.getConfig().get("bombermine.ctfgame.max_team_players");
@@ -94,18 +93,13 @@ public class CTFGame {
 			}
 		}
 		
-		// Initialize default spawn location
-		String[] coords = this.plugin.getConfig().get("bombermine.ctfgame.default_spawn").toString().split("/");
-		if(coords.length > 0) {
-			World world = this.plugin.getServer().getWorld(coords[0]);
-			if(world != null){
-				if(coords.length == 4) {
-					this.defaultSpawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
-				}
-				else if(coords.length == 6) {
-					this.defaultSpawn = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
-				}
-			}
+		// Initialize home world
+		String homeWorld = this.plugin.getConfig().getString("bombermine.ctfgame.home_world");
+		this.world = plugin.getServer().getWorld(homeWorld);
+		if (world == null) {
+			world = plugin.getServer().getWorlds().get(0);
+			this.plugin.getConfig().set("bombermine.ctfgame.home_world", world.getName());
+			this.plugin.saveConfig();
 		}
 
 		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
@@ -253,25 +247,8 @@ public class CTFGame {
 	 * Set default spawn for players who are not in a team
 	 * @param location 
 	 */
-	public void setDefaultSpawn(Location location){
-		this.defaultSpawn = location;
-		
-		// Location config format: world/x/y/z/yaw/pitch
-		location.toString(); 
-		StringBuilder sb = new StringBuilder();
-		sb.append(location.getWorld().getName());
-		sb.append("/");
-		sb.append(location.getBlockX());
-		sb.append("/");
-		sb.append(location.getBlockY());
-		sb.append("/");
-		sb.append(location.getBlockZ());
-		/*sb.append("/");
-		sb.append(location.getYaw());
-		sb.append("/");
-		sb.append(location.getPitch());*/
-		this.plugin.getConfig().set("bombermine.ctfgame.default_spawn", sb.toString());
-		this.plugin.saveConfig();
+	public void setDefaultSpawn(Location loc){
+		this.world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 	
 	public void saveTeamConfig(String id, String key, String value){

@@ -46,13 +46,11 @@ public class SpawnListener implements Listener {
 	 */
 	@EventHandler
 	public void respawnPlayer(PlayerRespawnEvent event) {
-		Location home = plugin.getCtfGame().getDefaultSpawn();
 		Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
-		
-		// No team ? Go home !
-		if (team == null) event.getPlayer().teleport(home);
-		
+
 		// TODO detect if game is started
-		event.getPlayer().teleport(team.getSpawnLoc());
+		if (team != null) {
+			event.setRespawnLocation(team.getSpawnLoc());			
+		}
 	}
 }

@@ -39,7 +39,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 
 		ChatColor msgColor = ChatColor.GREEN;
 		ChatColor errColor = ChatColor.RED;
-		ChatColor bcColor = ChatColor.GOLD;
+		//ChatColor bcColor = ChatColor.GOLD;
 
 		// TODO a simplifier (permissions user/moderator/admin)
 		
@@ -118,7 +118,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 						sender.sendMessage(ERROR_UNAUTHORIZED);
 					}
 				} else {
-					if(player == null){
+					if(player != null){
 						if(hasModRights(player)){
 							player.sendMessage(msgColor + "/bm join | join [player] <team>");
 						}else if(hasPlayerRights(player)){
