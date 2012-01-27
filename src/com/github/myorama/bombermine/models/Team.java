@@ -119,15 +119,15 @@ public class Team {
 		StringBuilder sb = new StringBuilder();
 		sb.append(location.getWorld().getName());
 		sb.append("/");
-		sb.append(location.getX());
+		sb.append(location.getBlockX());
 		sb.append("/");
-		sb.append(location.getY());
+		sb.append(location.getBlockY());
 		sb.append("/");
-		sb.append(location.getZ());
-		sb.append("/");
+		sb.append(location.getBlockZ());
+		/*sb.append("/");
 		sb.append(location.getYaw());
 		sb.append("/");
-		sb.append(location.getPitch());
+		sb.append(location.getPitch());*/
 		
 		this.ctfGame.saveTeamConfig(this.id, "spawn", sb.toString());
 	}

@@ -55,6 +55,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 				}
 				if (hasAdminRights(player)) {
 					player.sendMessage(msgColor + "/bm team spawn <team>");
+					player.sendMessage(msgColor + "/bm home");
 				}
 			} else {
 				sender.sendMessage(msgColor + "/bm join <player> <team>");

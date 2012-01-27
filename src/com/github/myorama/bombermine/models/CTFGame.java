@@ -54,6 +54,10 @@ public class CTFGame {
 	public void addNewTeam(String id, Team team) {
 		teams.put(id, team);
 	}
+	
+	public Location getDefaultSpawn() {
+		return this.defaultSpawn;
+	}
 
 	public void initialize() {
 		// Max team size
@@ -253,18 +257,19 @@ public class CTFGame {
 		this.defaultSpawn = location;
 		
 		// Location config format: world/x/y/z/yaw/pitch
+		location.toString(); 
 		StringBuilder sb = new StringBuilder();
 		sb.append(location.getWorld().getName());
 		sb.append("/");
-		sb.append(location.getX());
+		sb.append(location.getBlockX());
 		sb.append("/");
-		sb.append(location.getY());
+		sb.append(location.getBlockY());
 		sb.append("/");
-		sb.append(location.getZ());
-		sb.append("/");
+		sb.append(location.getBlockZ());
+		/*sb.append("/");
 		sb.append(location.getYaw());
 		sb.append("/");
-		sb.append(location.getPitch());
+		sb.append(location.getPitch());*/
 		this.plugin.getConfig().set("bombermine.ctfgame.default_spawn", sb.toString());
 		this.plugin.saveConfig();
 	}
