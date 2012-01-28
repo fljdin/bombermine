@@ -113,6 +113,16 @@ public class Team {
 	public Location getSpawnLoc() { return spawn; }
 	public void setSpawnLoc(Location l) { spawn = l; }
 	
+	public String getSpawnCoords() {
+		return String.format("%s/%s/%s/%s/%s/%s", 
+				spawn.getWorld().getName(),
+				spawn.getBlockX(),
+				spawn.getBlockY(),
+				spawn.getBlockZ(),
+				spawn.getYaw(),
+				spawn.getPitch());
+	}
+	
 	public Wool getFlag() { return flag; }
 	public void setFlag(Wool w) { flag = w; }
 

@@ -233,13 +233,13 @@ public class CTFGame {
 		this.world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 	
-	public void saveTeamConfig(String id, String key, String value){
+	public void saveTeamConfig(String color, String key, String value){
 		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
 		for (Map<String, Object> teamConfigMap : configTeams) {
 			if (teamConfigMap instanceof Map) {
-				String cfgId = (String) teamConfigMap.get("id");
-				if (id != null) {
-					if(cfgId.equals(id)){
+				String cfgColor = (String) teamConfigMap.get("color");
+				if (color != null) {
+					if(cfgColor.equalsIgnoreCase(color)){
 						teamConfigMap.remove(key);
 						teamConfigMap.put(key, value);
 					}

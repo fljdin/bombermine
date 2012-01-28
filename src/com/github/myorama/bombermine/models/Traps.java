@@ -118,7 +118,7 @@ public class Traps {
 	 * @return true or false
 	 */
 	public boolean isTeamTrapped(Location loc, String colorTeam) {
-		Pattern p = Pattern.compile(formatLocation(loc)+"(\\W+)");
+		Pattern p = Pattern.compile(formatLocation(loc)+"(\\w+)");
 		Matcher m = p.matcher(traps);
 		
 		// no trap found
@@ -126,7 +126,7 @@ public class Traps {
 
 		// get trap owner team and compare
 		String ownerTeam = m.group(1);
-		if (ownerTeam.equals(colorTeam)) {
+		if (ownerTeam.equalsIgnoreCase(colorTeam)) {
 			return false;
 		}
 		

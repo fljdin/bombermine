@@ -160,6 +160,7 @@ public class BombermineCommandExecutor implements CommandExecutor {
 									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
 									if(team != null){
 										team.setSpawnLoc(player.getLocation());
+										plugin.getCtfGame().saveTeamConfig(team.getColor(), "spawn", team.getSpawnCoords());
 										sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
 									}else{
 										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
