@@ -115,10 +115,42 @@ public class Team {
 	
 	public boolean hasPlayer(Player p) { return players.contains(p); }
 	
+	/**
+	 * Spawn players and set their inventory
+	 * @param player 
+	 */
 	public void spawnPlayers() {
-		for(Player p : players) {
-			p.teleport(this.spawn);
+		for(Player player : players) {
+			spawn(player);
 		}
+	}
+	
+	/**
+	 * Spawn player and set his inventory
+	 * @param player 
+	 */
+	public void spawn(Player player){
+		player.teleport(respawn(player));
+	}
+	
+	/**
+	 * Respawn player
+	 * @param player
+	 * @return Location
+	 */
+	public Location respawn(Player player){
+		// Cleaning inventory
+		ItemStack[] itemStacks = player.getInventory().getContents();
+		for (ItemStack itemStack : itemStacks) {
+			if(itemStack != null){
+				player.getInventory().remove(itemStack);
+			}
+		}
+		
+		// TODO set player inventory
+//		player.getInventory().addItem(new ItemStack(Material.APPLE));
+		
+		return this.spawn;
 	}
 	
 	/**

@@ -83,14 +83,18 @@ public class FlagListener implements Listener {
 
 	@EventHandler
 	public void changingGameMode(PlayerGameModeChangeEvent event){
-		if(event.getNewGameMode() == GameMode.SURVIVAL && plugin.getCtfGame().isStarted()){
+		if(event.getNewGameMode() == GameMode.SURVIVAL){
 			Player player = event.getPlayer();
-			Team team = plugin.getCtfGame().getPlayerTeam(player);
-			if(team != null){
-				player.teleport(team.getSpawnLoc());
-			}else{
-				player.teleport(plugin.getCtfGame().getDefaultSpawn());
+			
+			// Cleaning player inventory when changing to Survival mode
+			ItemStack[] itemStacks = player.getInventory().getContents();
+			for (ItemStack itemStack : itemStacks) {
+				if(itemStack != null){
+					player.getInventory().remove(itemStack);
+				}
 			}
+			
+			this.plugin.getCtfGame().spawnPlayer(player);
 		}
 	}
 	

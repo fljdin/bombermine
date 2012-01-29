@@ -1,5 +1,6 @@
 package com.github.myorama.bombermine.listeners;
 
+import com.github.myorama.bombermine.Bombermine;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -7,9 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-
-import com.github.myorama.bombermine.Bombermine;
-import com.github.myorama.bombermine.models.Team;
 
 /**
  * @author myorama
@@ -45,14 +43,7 @@ public class SpawnListener implements Listener {
 	 */
 	@EventHandler
 	public void respawnPlayer(PlayerRespawnEvent event) {
-		Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
-		if (team == null) return;
-				
-		// TODO detect if game is started
-		Location spawn = team.getSpawnLoc();
-		if (isSpawnable(spawn)) {
-			event.setRespawnLocation(spawn);			
-		}
+		event.setRespawnLocation(plugin.getCtfGame().respawnPlayer(event.getPlayer()));			
 	}
 	
 	/**

@@ -256,7 +256,7 @@ public class CTFGame {
 					if(player.getGameMode() != GameMode.CREATIVE){
 						this.addCooldown(player);
 					}
-					player.teleport(team.getSpawnLoc());
+					team.spawn(player);
 				}
 			}
 			return true;
@@ -405,6 +405,27 @@ public class CTFGame {
 				world.dropItem(player.getLocation(), flag);
 				plugin.sendBroadcastMessage(String.format("%s has lost the %s flag", player.getName(), entry.getKey().toLowerCase()));
 			}
+		}
+	}
+	
+	public synchronized void spawnPlayer(Player player){
+		if(isStarted()){
+			Team team = getPlayerTeam(player);
+			if(team != null){
+				player.teleport(team.getSpawnLoc());
+			}else{
+				team.spawn(player);
+			}
+		}
+	}
+	
+	public synchronized Location respawnPlayer(Player player){
+		Team team = getPlayerTeam(player);
+		if (team != null){
+			return team.respawn(player);
+		}
+		else{
+			return world.getSpawnLocation();
 		}
 	}
 }
