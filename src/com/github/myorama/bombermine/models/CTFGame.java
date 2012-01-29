@@ -255,6 +255,9 @@ public class CTFGame {
 				}else{
 					this.plugin.sendBroadcastMessage(player.getName() + " has joined team " + team.getName());
 				}
+				if(isStarted()){
+					player.teleport(team.getSpawnLoc());
+				}
 			}
 			return true;
 		}
