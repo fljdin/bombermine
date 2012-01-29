@@ -203,11 +203,13 @@ public class Team {
 		if(this.runner != null){
 			ItemStack[] itemStacks = this.runner.getInventory().getContents();
 			for (ItemStack itemStack : itemStacks) {
-				if(itemStack.getType() == Material.WOOL){
-					Wool wool = (Wool)itemStack.getData();
-					if(wool.getColor() == this.flagData.getColor()){
-						this.runner.getInventory().remove(itemStack);
-						break;
+				if(itemStack != null){
+					if(itemStack.getType() == Material.WOOL){
+						Wool wool = (Wool)itemStack.getData();
+						if(wool.getColor() == this.flagData.getColor()){
+							this.runner.getInventory().remove(itemStack);
+							break;
+						}
 					}
 				}
 			}
