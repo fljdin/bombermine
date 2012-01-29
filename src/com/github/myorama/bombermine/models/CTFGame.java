@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -63,11 +62,7 @@ public class CTFGame {
 	 */
 	public void start() {
 		synchronized(teamsLock){
-			plugin.getTraps().clear();
-			for (Map.Entry<String, Team> entry : teams.entrySet()) {
-				Team team = entry.getValue();
-				team.retrieved();
-			}
+			initNewGame();
 			this.started = true;
 			this.plugin.sendBroadcastMessage("The game has been started");
 		}
@@ -78,7 +73,6 @@ public class CTFGame {
 	 */
 	public void stop() {
 		synchronized(teamsLock){
-			plugin.getTraps().clear();
 			this.started = false;
 			this.plugin.sendBroadcastMessage("The game has been stopped");
 		}
@@ -89,9 +83,18 @@ public class CTFGame {
 	 */
 	public void restart() {
 		synchronized(teamsLock){
-			plugin.getTraps().clear();
+			initNewGame();
 			this.started = true;
 			this.plugin.sendBroadcastMessage("The game has been restarted");
+		}
+	}
+	
+	private void initNewGame(){
+		plugin.getTraps().clear();
+		for (Map.Entry<String, Team> entry : teams.entrySet()) {
+			Team team = entry.getValue();
+			team.retrieved();
+			team.spawnPlayers();
 		}
 	}
 
