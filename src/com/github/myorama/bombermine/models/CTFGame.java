@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
@@ -329,18 +330,21 @@ public class CTFGame {
 	}
 	
 	/**
-	 * Test if picked up item is a flag.
+	 * Pick up the flag
 	 * @param player
 	 * @param item
-	 * @return true if item is a flag, false otherwise
+	 * @return true if flag is picked up, false otherwise
 	 */
-	public synchronized void pickUpFlag(Player player, Item item){
+	public synchronized void pickUpFlag(PlayerPickupItemEvent event){
+		Player player = event.getPlayer();
+		Item item = event.getItem();
 		ItemStack itemStack = item.getItemStack();
 		if(itemStack.getType() == Material.WOOL){
 			Wool wool = (Wool) itemStack.getData();
 			Team flagTeam = this.getTeamByColor(wool.getColor().toString());
 			Team playerTeam = this.getPlayerTeam(player);
 			if(playerTeam == null){
+				event.setCancelled(true);
 				return;
 			}
 			if(flagTeam != null){
@@ -348,13 +352,14 @@ public class CTFGame {
 					if(playerTeam == flagTeam){
 						flagTeam.setRetrieved();
 						plugin.sendBroadcastMessage(String.format("%s has retrieved his %s flag !", player.getName(), playerTeam.getColor().toLowerCase()));
+						item.remove();
+						event.setCancelled(true);
 					}else{
 						flagTeam.setRunner(player);
 						plugin.sendBroadcastMessage(String.format("%s has picked up the %s flag !", player.getName(), flagTeam.getColor().toLowerCase()));
 					}
 				}
 			}
-			item.remove();
 		}
 	}
 }

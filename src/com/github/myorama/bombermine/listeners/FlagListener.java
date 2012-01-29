@@ -28,13 +28,8 @@ public class FlagListener implements Listener {
 	 */
 	@EventHandler
 	public void pickUpFlag(PlayerPickupItemEvent event) {
-
-		Player player = event.getPlayer();
-		ItemStack item = event.getItem().getItemStack();
-		if (item.getType() == Material.WOOL) {
-			this.plugin.getCtfGame().pickUpFlag(player, event.getItem());
-			event.setCancelled(true);
-		}
+		// rooting event to call a CTFGame synchronized method
+		this.plugin.getCtfGame().pickUpFlag(event);
 	}
 	
 	/**
