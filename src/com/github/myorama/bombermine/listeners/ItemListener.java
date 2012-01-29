@@ -1,7 +1,10 @@
 package com.github.myorama.bombermine.listeners;
 
+import com.github.myorama.bombermine.Bombermine;
+import com.github.myorama.bombermine.models.Team;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,10 +13,7 @@ import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
-import com.github.myorama.bombermine.Bombermine;
-import com.github.myorama.bombermine.models.Team;
 
 /**
  * @author myorama
@@ -53,7 +53,7 @@ public class ItemListener implements Listener {
 			if (team == null) {
 				event.setCancelled(true);
 
-			} else if (!team.isTeamFlag(wool)) {
+			} else if (team.getFlagData().getColor() == wool.getColor()) {
 				// broadcast the niouz!
 				plugin.sendBroadcastMessage(String.format(
 						"%s%s pickup the %s flag!", ChatColor.LIGHT_PURPLE,
@@ -74,18 +74,15 @@ public class ItemListener implements Listener {
 	public void preventFlagBreak(BlockBreakEvent event) {
 
 		Player player = event.getPlayer();
-		MaterialData item = event.getBlock().getState().getData();
+		Block block = event.getBlock();
 
-		if (item instanceof Wool) {
-			Wool wool = (Wool)item;
-			Team team = plugin.getCtfGame().getPlayerTeam(player);
-			
-			if (team == null) {
-				event.setCancelled(true);
-				
-			} else if (team.isTeamFlag(wool)) {
-				event.setCancelled(true);
-			}
+		Team team = plugin.getCtfGame().getPlayerTeam(player);
+		
+		if (team == null) {
+			event.setCancelled(true);
+		} else if (team.isTeamFlag(block)) {
+			player.sendMessage(String.format("%sYou cannot pick up your own team flag", ChatColor.RED));
+			event.setCancelled(true);
 		}
 		
 	}

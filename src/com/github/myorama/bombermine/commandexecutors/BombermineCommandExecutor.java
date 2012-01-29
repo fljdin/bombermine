@@ -8,6 +8,8 @@ import com.github.myorama.bombermine.Bombermine;
 import com.github.myorama.bombermine.models.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -160,7 +162,6 @@ public class BombermineCommandExecutor implements CommandExecutor {
 									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
 									if(team != null){
 										team.setSpawnLoc(player.getLocation());
-										plugin.getCtfGame().saveTeamConfig(team.getColor(), "spawn", team.getSpawnCoords());
 										sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
 									}else{
 										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
@@ -174,9 +175,36 @@ public class BombermineCommandExecutor implements CommandExecutor {
 						}else{
 							sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
 						}
+					}else if(args[1].equals("flag")){
+						if(player != null){
+							if(hasAdminRights(player)){
+								if(args.length == 3){ // team flag <team>
+									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
+									if(team != null){
+										Location flagLocation = player.getEyeLocation();
+										Block flag = player.getTargetBlock(null, 30);
+										if(flag != null){
+											team.setFlag(flag);
+											sender.sendMessage(msgColor + "Team flag location set for " + args[2] + " team");
+										}else{
+											sender.sendMessage(errColor + "You need to target the flag location");
+										}
+									}else{
+										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
+									}
+								}else{
+									sender.sendMessage(msgColor + "/bm team flag <team>");
+								}
+							}else{
+								sender.sendMessage(errColor + ERROR_UNAUTHORIZED);
+							}
+						}else{
+							sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
+						}
 					}
 				}else{
 					sender.sendMessage(msgColor + "/bm team spawn <team>");
+					sender.sendMessage(msgColor + "/bm team flag <team>");
 				}
 			}else if (args[0].equals("home")) {
 				if(args.length == 1){ // home
