@@ -53,6 +53,7 @@ public class DeathListener implements Listener {
 					}
 				}				
 				event.getDrops().retainAll(flags);
+				plugin.getCtfGame().removeRunner(player);
 
 				// Start cooldown for this player
 				if(player.getGameMode() != GameMode.CREATIVE){

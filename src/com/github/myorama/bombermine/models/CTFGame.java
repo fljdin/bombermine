@@ -378,4 +378,14 @@ public class CTFGame {
 			}
 		}
 	}
+	
+	public synchronized void removeRunner(Player player){
+		for (Map.Entry<String, Team> entry : teams.entrySet()) {
+			Team team = entry.getValue();
+			if(team.getRunner() == player){
+				team.setRunner(null);
+				plugin.sendBroadcastMessage(String.format("%s has lost the %s flag", player.getName(), entry.getKey().toLowerCase()));
+			}
+		}
+	}
 }
