@@ -284,10 +284,10 @@ public class CTFGame {
 	
 	public synchronized boolean removePlayer(Player player){
 		Team currentTeam = this.getPlayerTeam(player);
-		// TODO Manage if player had a flag
 		boolean ret = currentTeam.removePlayer(player);
 		if(ret){
 			if(isStarted()){
+				this.removeRunner(player);
 				if(player.getGameMode() != GameMode.CREATIVE){
 					this.addCooldown(player);
 				}
@@ -305,7 +305,7 @@ public class CTFGame {
 	public void addCooldown(Player p) {
 		if (started) {
 			cooldown.put(p.getName(), System.currentTimeMillis());
-			p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+seconds+" seconds.");
+			p.sendMessage(ChatColor.BLUE + "You have to wait " + seconds + " seconds after respawn.");
 		}
 	}
 	

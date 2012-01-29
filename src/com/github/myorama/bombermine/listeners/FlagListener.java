@@ -97,7 +97,7 @@ public class FlagListener implements Listener {
 	@EventHandler
 	public void leavingRunner(PlayerQuitEvent event){
 		Player player = event.getPlayer();
-		this.plugin.getCtfGame().removeRunner(player);
+		this.plugin.getCtfGame().removePlayer(player);
 	}
 	
 	@EventHandler
