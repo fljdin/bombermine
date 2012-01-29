@@ -18,23 +18,52 @@ public class CTFGame {
 	private Integer maxTeamPlayers = null;
 	private World world = null;
 	private Long seconds;
+	private boolean friendlyFire = false;
+	private boolean started = false;
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
 		seconds = plugin.getConfig().getLong("bombermine.ctfgame.respawn_cooldown");
+		friendlyFire = plugin.getConfig().getBoolean("bombermine.ctfgame.friendly_fire");
 	}
 
 	public Bombermine getPlugin() {
 		return this.plugin;
+	}
+	
+	/**
+	 * Get max players by team
+	 * @return max players
+	 */
+	public Integer getMax(){
+		return this.maxTeamPlayers;
+	}
+	
+	/**
+	 * Know if game is started or not
+	 * @return true or false
+	 */
+	public boolean isStarted() {
+		return this.started;
+	}
+	
+	public boolean isFriendlyFire() {
+		return this.friendlyFire;
 	}
 
 	/*
 	 * Game management
 	 */
 	public void start() {
+
+		plugin.getTraps().clear();
+		this.started = true;
 	}
 
 	public void stop() {
+
+		plugin.getTraps().clear();
+		this.started = false;
 	}
 
 	/**
@@ -47,10 +76,28 @@ public class CTFGame {
 		return teams.get(color.toUpperCase());
 	}
 
+	/**
+	 * Add a team object index by color
+	 * 
+	 * @param color
+	 * @param team object
+	 */
 	public void addNewTeam(String color, Team team) {
 		teams.put(color.toUpperCase(), team);
 	}
 	
+	/**
+	 * Set default spawn for players who are not in a team
+	 * @param location 
+	 */
+	public void setDefaultSpawn(Location loc){
+		this.world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	}
+	
+	/**
+	 * Get default spawn of world
+	 * @return Location
+	 */
 	public Location getDefaultSpawn() {
 		return this.world.getSpawnLocation();
 	}
@@ -103,6 +150,29 @@ public class CTFGame {
 		}
 
 		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
+	}
+
+	/**
+	 * Save key/value for a team in config.yml
+	 * @param color
+	 * @param key
+	 * @param value
+	 */
+	public void saveTeamConfig(String color, String key, String value){
+		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
+		for (Map<String, Object> teamConfigMap : configTeams) {
+			if (teamConfigMap instanceof Map) {
+				String cfgColor = (String) teamConfigMap.get("color");
+				if (color != null) {
+					if(cfgColor.equalsIgnoreCase(color)){
+						teamConfigMap.remove(key);
+						teamConfigMap.put(key, value);
+					}
+				}
+			}
+		}
+		this.plugin.getConfig().set("bombermine.teams", configTeams);
+		this.plugin.saveConfig();
 	}
 
 	/**
@@ -188,12 +258,14 @@ public class CTFGame {
 	}
 	
 	/**
-	 * Start counting for player cooldown
+	 * Start counting for player cooldown during game
 	 * @param player who waiting
 	 */
 	public void addCooldown(Player p) {
-		cooldown.put(p.getName(), System.currentTimeMillis());
-		p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+seconds+" seconds.");
+		if (started) {
+			cooldown.put(p.getName(), System.currentTimeMillis());
+			p.sendMessage(ChatColor.BLUE+"You're dead. You have to wait "+seconds+" seconds.");
+		}
 	}
 	
 	/**
@@ -215,38 +287,5 @@ public class CTFGame {
 		} catch (NullPointerException e) { }
 		
 		return false;
-	}
-	
-	/**
-	 * Get max players by team
-	 * @return max players
-	 */
-	public Integer getMax(){
-		return this.maxTeamPlayers;
-	}
-	
-	/**
-	 * Set default spawn for players who are not in a team
-	 * @param location 
-	 */
-	public void setDefaultSpawn(Location loc){
-		this.world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-	}
-	
-	public void saveTeamConfig(String color, String key, String value){
-		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
-		for (Map<String, Object> teamConfigMap : configTeams) {
-			if (teamConfigMap instanceof Map) {
-				String cfgColor = (String) teamConfigMap.get("color");
-				if (color != null) {
-					if(cfgColor.equalsIgnoreCase(color)){
-						teamConfigMap.remove(key);
-						teamConfigMap.put(key, value);
-					}
-				}
-			}
-		}
-		this.plugin.getConfig().set("bombermine.teams", configTeams);
-		this.plugin.saveConfig();
 	}
 }
