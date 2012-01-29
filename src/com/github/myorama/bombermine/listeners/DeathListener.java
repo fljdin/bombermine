@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.myorama.bombermine.Bombermine;
 import com.github.myorama.bombermine.models.Team;
+import org.bukkit.GameMode;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +41,8 @@ public class DeathListener implements Listener {
 		Entity e = event.getEntity();
 		
 		if (e instanceof Player) {
-			Team t = plugin.getCtfGame().getPlayerTeam((Player)e);
+			Player player = (Player)e;
+			Team t = plugin.getCtfGame().getPlayerTeam(player);
 			
 			if (t != null) {
 				// Drop only flags if presents
@@ -53,7 +55,9 @@ public class DeathListener implements Listener {
 				event.getDrops().retainAll(flags);
 
 				// Start cooldown for this player
-				plugin.getCtfGame().addCooldown((Player)e);				
+				if(player.getGameMode() != GameMode.CREATIVE){
+					plugin.getCtfGame().addCooldown(player);
+				}
 			}			
 		}
 	}
