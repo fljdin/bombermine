@@ -2,12 +2,14 @@ package com.github.myorama.bombermine.models;
 
 import com.github.myorama.bombermine.Bombermine;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import org.bukkit.*;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
 public class Team {
@@ -196,7 +198,21 @@ public class Team {
 		this.runner = player;
 	}
 	
-	public void setRetrieved(){
+	public void retrieved(){
+		// Remove flag from runner invetory (useful when starting or stopping game)
+		if(this.runner != null){
+			ItemStack[] itemStacks = this.runner.getInventory().getContents();
+			for (ItemStack itemStack : itemStacks) {
+				if(itemStack.getType() == Material.WOOL){
+					Wool wool = (Wool)itemStack.getData();
+					if(wool.getColor() == this.flagData.getColor()){
+						this.runner.getInventory().remove(itemStack);
+						break;
+					}
+				}
+			}
+			this.runner = null;
+		}
 		this.flag.setType(Material.WOOL);
 		this.flag.setData(flagData.getData());
 	}

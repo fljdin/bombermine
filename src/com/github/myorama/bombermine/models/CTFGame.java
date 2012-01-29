@@ -64,6 +64,10 @@ public class CTFGame {
 	public void start() {
 		synchronized(teamsLock){
 			plugin.getTraps().clear();
+			for (Map.Entry<String, Team> entry : teams.entrySet()) {
+				Team team = entry.getValue();
+				team.retrieved();
+			}
 			this.started = true;
 			this.plugin.sendBroadcastMessage("The game has been started");
 		}
@@ -350,7 +354,7 @@ public class CTFGame {
 			if(flagTeam != null){
 				if(flagTeam.isLootableFlag()){
 					if(playerTeam == flagTeam){
-						flagTeam.setRetrieved();
+						flagTeam.retrieved();
 						plugin.sendBroadcastMessage(String.format("%s has retrieved his %s flag !", player.getName(), playerTeam.getColor().toLowerCase()));
 						item.remove();
 						event.setCancelled(true);
