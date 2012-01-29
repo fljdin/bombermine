@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,6 +78,19 @@ public class FlagListener implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void changingGameMode(PlayerGameModeChangeEvent event){
+		if(event.getNewGameMode() == GameMode.SURVIVAL && plugin.getCtfGame().isStarted()){
+			Player player = event.getPlayer();
+			Team team = plugin.getCtfGame().getPlayerTeam(player);
+			if(team != null){
+				player.teleport(team.getSpawnLoc());
+			}else{
+				player.teleport(plugin.getCtfGame().getDefaultSpawn());
+			}
+		}
+	}
+	
 	@EventHandler
 	public void preventFlagSwitch(PlayerItemHeldEvent event) {
 		// TODO check if player doesnt delong to flag's team
