@@ -287,11 +287,24 @@ public class CTFGame {
 		boolean ret = currentTeam.removePlayer(player);
 		if(ret){
 			if(isStarted()){
+				// Dropping flags
 				this.removeRunner(player);
+				
+				// Adding cooldown
 				if(player.getGameMode() != GameMode.CREATIVE){
 					this.addCooldown(player);
 				}
+				
+				// Teleporting to default spawn
 				player.teleport(world.getSpawnLocation());
+				
+				// Cleaning inventory
+				ItemStack[] itemStacks = player.getInventory().getContents();
+				for (ItemStack itemStack : itemStacks) {
+					if(itemStack != null){
+						player.getInventory().remove(itemStack);
+					}
+				}
 			}
 			this.plugin.sendBroadcastMessage(player.getName() + " has left his team (" + currentTeam.getName() + ")");
 		}
