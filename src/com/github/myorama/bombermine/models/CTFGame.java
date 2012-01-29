@@ -4,10 +4,7 @@ import com.github.myorama.bombermine.Bombermine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -256,6 +253,9 @@ public class CTFGame {
 					this.plugin.sendBroadcastMessage(player.getName() + " has joined team " + team.getName());
 				}
 				if(isStarted()){
+					if(player.getGameMode() != GameMode.CREATIVE){
+						this.addCooldown(player);
+					}
 					player.teleport(team.getSpawnLoc());
 				}
 			}
@@ -287,6 +287,12 @@ public class CTFGame {
 		// TODO Manage if player had a flag
 		boolean ret = currentTeam.removePlayer(player);
 		if(ret){
+			if(isStarted()){
+				if(player.getGameMode() != GameMode.CREATIVE){
+					this.addCooldown(player);
+				}
+				player.teleport(world.getSpawnLocation());
+			}
 			this.plugin.sendBroadcastMessage(player.getName() + " has left his team (" + currentTeam.getName() + ")");
 		}
 		return ret;
