@@ -54,7 +54,8 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					player.sendMessage(msgColor + "/bm leave");
 				}
 				if (hasAdminRights(player)) {
-					player.sendMessage(msgColor + "/bm setspawn <team>");
+					player.sendMessage(msgColor + "/bm team spawn <team>");
+					player.sendMessage(msgColor + "/bm home");
 				}
 			} else {
 				sender.sendMessage(msgColor + "/bm join <player> <team>");
@@ -122,6 +123,8 @@ public class BombermineCommandExecutor implements CommandExecutor {
 							player.sendMessage(msgColor + "/bm join | join [player] <team>");
 						}else if(hasPlayerRights(player)){
 							player.sendMessage(msgColor + "/bm join [team]");
+						}else{
+							sender.sendMessage(ERROR_UNAUTHORIZED);
 						}
 					} else {
 						sender.sendMessage(msgColor + "/bm join <player> <team>");
@@ -148,6 +151,50 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					}
 				}
 			}
+			else if (args[0].equals("team")) {
+				if(args.length > 1){
+					if(args[1].equals("spawn")){
+						if(player != null){
+							if(hasAdminRights(player)){
+								if(args.length == 3){ // team spawn <team>
+									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
+									if(team != null){
+										team.setSpawnLoc(player.getLocation());
+										plugin.getCtfGame().saveTeamConfig(team.getColor(), "spawn", team.getSpawnCoords());
+										sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
+									}else{
+										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
+									}
+								}else{
+									sender.sendMessage(msgColor + "/bm team spawn <team>");
+								}
+							}else{
+								sender.sendMessage(errColor + ERROR_UNAUTHORIZED);
+							}
+						}else{
+							sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
+						}
+					}
+				}else{
+					sender.sendMessage(msgColor + "/bm team spawn <team>");
+				}
+			}else if (args[0].equals("home")) {
+				if(args.length == 1){ // home
+					if(player != null){
+						if(hasAdminRights(player)){
+							this.plugin.getCtfGame().setDefaultSpawn(player.getLocation());
+							sender.sendMessage(msgColor + "Default spawn location set");
+						}else{
+							sender.sendMessage(errColor + ERROR_UNAUTHORIZED);
+						}
+					}else{
+						sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
+					}
+				}else{
+					sender.sendMessage(msgColor + "/bm home");
+				}
+			}
+			
 		}
 		return true;
 	}

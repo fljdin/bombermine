@@ -4,22 +4,20 @@ import com.github.myorama.bombermine.Bombermine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class CTFGame {
 
+	private Bombermine plugin;
 	private Map<String, Team> teams = new HashMap<String, Team>();
 	private Map<String, Long> cooldown = new HashMap<String, Long>();
 	private final Object teamsLock = new Object();
-	private Long seconds;
-	private Bombermine plugin;
-	
-	/**
-	 * Max player by team
-	 */
 	private Integer maxTeamPlayers = null;
+	private World world = null;
+	private Long seconds;
 
 	public CTFGame(Bombermine instance) {
 		plugin = instance;
@@ -52,7 +50,14 @@ public class CTFGame {
 	public void addNewTeam(String color, Team team) {
 		teams.put(color.toUpperCase(), team);
 	}
+	
+	public Location getDefaultSpawn() {
+		return this.world.getSpawnLocation();
+	}
 
+	/**
+	 * Read and parse teams configuration
+	 */
 	public void initialize() {
 		// Max team size
 		Object cMax = plugin.getConfig().get("bombermine.ctfgame.max_team_players");
@@ -86,6 +91,15 @@ public class CTFGame {
 					}
 				}
 			}
+		}
+		
+		// Initialize home world
+		String homeWorld = this.plugin.getConfig().getString("bombermine.ctfgame.home_world");
+		this.world = plugin.getServer().getWorld(homeWorld);
+		if (world == null) {
+			world = plugin.getServer().getWorlds().get(0);
+			this.plugin.getConfig().set("bombermine.ctfgame.home_world", world.getName());
+			this.plugin.saveConfig();
 		}
 
 		Bombermine.log.info(String.format("Loading %d teams from config file.", teams.size()));
@@ -209,5 +223,30 @@ public class CTFGame {
 	 */
 	public Integer getMax(){
 		return this.maxTeamPlayers;
+	}
+	
+	/**
+	 * Set default spawn for players who are not in a team
+	 * @param location 
+	 */
+	public void setDefaultSpawn(Location loc){
+		this.world.setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	}
+	
+	public void saveTeamConfig(String color, String key, String value){
+		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
+		for (Map<String, Object> teamConfigMap : configTeams) {
+			if (teamConfigMap instanceof Map) {
+				String cfgColor = (String) teamConfigMap.get("color");
+				if (color != null) {
+					if(cfgColor.equalsIgnoreCase(color)){
+						teamConfigMap.remove(key);
+						teamConfigMap.put(key, value);
+					}
+				}
+			}
+		}
+		this.plugin.getConfig().set("bombermine.teams", configTeams);
+		this.plugin.saveConfig();
 	}
 }

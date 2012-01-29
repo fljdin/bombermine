@@ -53,7 +53,7 @@ public class Team {
 					}
 				}
 				
-				coords = config.get("flagLoc").toString().split("/");
+				coords = config.get("flag_loc").toString().split("/");
 				if(coords.length > 0) {
 					World world = this.ctfGame.getPlugin().getServer().getWorld(coords[0]);
 					if(world != null){
@@ -111,12 +111,21 @@ public class Team {
 	public String getName() { return name; }
 
 	public Location getSpawnLoc() { return spawn; }
-	public void setSpawnLoc(Location s) { spawn = s; }
+	public void setSpawnLoc(Location l) { spawn = l; }
+	
+	public String getSpawnCoords() {
+		return String.format("%s/%s/%s/%s/%s/%s", 
+				spawn.getWorld().getName(),
+				spawn.getBlockX(),
+				spawn.getBlockY(),
+				spawn.getBlockZ(),
+				spawn.getYaw(),
+				spawn.getPitch());
+	}
 	
 	public Wool getFlag() { return flag; }
 	public void setFlag(Wool w) { flag = w; }
 
 	public Location getFlagLoc() { return flagLoc; }
 	public void setFlagLoc(Location fl) { flagLoc = fl;	}
-
 }
