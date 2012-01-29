@@ -1,11 +1,7 @@
 package com.github.myorama.bombermine;
 
 import com.github.myorama.bombermine.commandexecutors.BombermineCommandExecutor;
-import com.github.myorama.bombermine.listeners.AccelerationListener;
-import com.github.myorama.bombermine.listeners.DeathListener;
-import com.github.myorama.bombermine.listeners.SpawnListener;
-import com.github.myorama.bombermine.listeners.ItemListener;
-import com.github.myorama.bombermine.listeners.TrapListener;
+import com.github.myorama.bombermine.listeners.*;
 import com.github.myorama.bombermine.models.CTFGame;
 import com.github.myorama.bombermine.models.Traps;
 import java.io.File;
@@ -40,6 +36,7 @@ public class Bombermine extends JavaPlugin {
 		pm.registerEvents(new TrapListener(this), this);
 		pm.registerEvents(new SpawnListener(this), this);
 		pm.registerEvents(new ItemListener(this), this);
+		pm.registerEvents(new FlagListener(this), this);
 				
 		// Copying and merging default config.yml file to plugin folder
 		this.getConfig().options().copyDefaults(true);
