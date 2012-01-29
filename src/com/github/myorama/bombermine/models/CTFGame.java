@@ -6,8 +6,14 @@ import java.util.List;
 import java.util.Map;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Wool;
 
 public class CTFGame {
 
@@ -51,19 +57,37 @@ public class CTFGame {
 		return this.friendlyFire;
 	}
 
-	/*
-	 * Game management
+	/**
+	 * Start the game
 	 */
 	public void start() {
-
-		plugin.getTraps().clear();
-		this.started = true;
+		synchronized(teamsLock){
+			plugin.getTraps().clear();
+			this.started = true;
+			this.plugin.sendBroadcastMessage("The game has been started");
+		}
 	}
 
+	/**
+	 * Stop the game
+	 */
 	public void stop() {
-
-		plugin.getTraps().clear();
-		this.started = false;
+		synchronized(teamsLock){
+			plugin.getTraps().clear();
+			this.started = false;
+			this.plugin.sendBroadcastMessage("The game has been stopped");
+		}
+	}
+	
+	/**
+	 * Restart the game
+	 */
+	public void restart() {
+		synchronized(teamsLock){
+			plugin.getTraps().clear();
+			this.started = true;
+			this.plugin.sendBroadcastMessage("The game has been restarted");
+		}
 	}
 
 	/**
@@ -105,7 +129,7 @@ public class CTFGame {
 	/**
 	 * Read and parse teams configuration
 	 */
-	public void initialize() {
+	public synchronized void  initialize() {
 		// Max team size
 		Object cMax = plugin.getConfig().get("bombermine.ctfgame.max_team_players");
 		if(cMax instanceof Integer) {
@@ -158,7 +182,7 @@ public class CTFGame {
 	 * @param key
 	 * @param value
 	 */
-	public void saveTeamConfig(String color, String key, String value){
+	public synchronized void saveTeamConfig(String color, String key, String value){
 		List<Map<String, Object>> configTeams = plugin.getConfig().getMapList("bombermine.teams");
 		for (Map<String, Object> teamConfigMap : configTeams) {
 			if (teamConfigMap instanceof Map) {
@@ -180,7 +204,7 @@ public class CTFGame {
 	 * @param player to add
 	 * @return true if set or false if teams are full
 	 */
-	public boolean setPlayerTeam(Player player) {
+	public synchronized boolean setPlayerTeam(Player player) {
 		return this.setPlayerTeam(player, null);
 	}
 	
@@ -190,43 +214,41 @@ public class CTFGame {
 	 * @param team team
 	 * @return true if added, false if team is full
 	 */
-	public boolean setPlayerTeam(Player player, Team team){
-		synchronized(teamsLock){
-			Team currentPlayerTeam = this.getPlayerTeam(player);
-			if(team == null){
-				// Try to find the best team to join
-				for (Map.Entry<String, Team> candidate : teams.entrySet()) {
-					if (team == null) {
+	public synchronized boolean setPlayerTeam(Player player, Team team){
+		Team currentPlayerTeam = this.getPlayerTeam(player);
+		if(team == null){
+			// Try to find the best team to join
+			for (Map.Entry<String, Team> candidate : teams.entrySet()) {
+				if (team == null) {
+					team = candidate.getValue();
+				} else {
+					int tSize1 = team.getPlayers().size();
+					int tSize2 = candidate.getValue().getPlayers().size();
+					if(team == currentPlayerTeam){
+						tSize1--;
+					}
+					else if(candidate.getValue() == currentPlayerTeam){
+						tSize2--;
+					}
+					if(tSize1 > tSize2){ // Team candidate is better
 						team = candidate.getValue();
-					} else {
-						int tSize1 = team.getPlayers().size();
-						int tSize2 = candidate.getValue().getPlayers().size();
-						if(team == currentPlayerTeam){
-							tSize1--;
-						}
-						else if(candidate.getValue() == currentPlayerTeam){
-							tSize2--;
-						}
-						if(tSize1 > tSize2){ // Team candidate is better
-							team = candidate.getValue();
-						}
 					}
 				}
 			}
-			
-			if(team != null && team.getPlayers().size() < this.maxTeamPlayers){
+		}
+
+		if(team != null && team.getPlayers().size() < this.maxTeamPlayers){
+			if(currentPlayerTeam != null){
+				currentPlayerTeam.removePlayer(player);
+			}
+			if(team.addPlayer(player)){
 				if(currentPlayerTeam != null){
-					currentPlayerTeam.removePlayer(player);
+					this.plugin.sendBroadcastMessage(player.getName() + " moved from team " + currentPlayerTeam.getName() + " to team " + team.getName());
+				}else{
+					this.plugin.sendBroadcastMessage(player.getName() + " has joined team " + team.getName());
 				}
-				if(team.addPlayer(player)){
-					if(currentPlayerTeam != null){
-						this.plugin.sendBroadcastMessage(player.getName() + " moved from team " + currentPlayerTeam.getName() + " to team " + team.getName());
-					}else{
-						this.plugin.sendBroadcastMessage(player.getName() + " has joined team " + team.getName());
-					}
-				}
-				return true;
 			}
+			return true;
 		}
 		return false;
 	}
@@ -236,7 +258,7 @@ public class CTFGame {
 	 * @param player
 	 * @return team or null if not in a team
 	 */
-	public Team getPlayerTeam(Player player){
+	public synchronized Team getPlayerTeam(Player player){
 		Team playerTeam = null;
 		for (Map.Entry<String, Team> teamEntry : teams.entrySet()) {
 			for(Player tPlayer : teamEntry.getValue().getPlayers()){
@@ -249,12 +271,14 @@ public class CTFGame {
 		return playerTeam;
 	}
 	
-	public boolean removePlayer(Player player){
-		synchronized(teamsLock){
-			Team currentTeam = this.getPlayerTeam(player);
+	public synchronized boolean removePlayer(Player player){
+		Team currentTeam = this.getPlayerTeam(player);
+		// TODO Manage if player had a flag
+		boolean ret = currentTeam.removePlayer(player);
+		if(ret){
 			this.plugin.sendBroadcastMessage(player.getName() + " has left his team (" + currentTeam.getName() + ")");
-			return currentTeam.removePlayer(player);
 		}
+		return ret;
 	}
 	
 	/**
@@ -287,5 +311,50 @@ public class CTFGame {
 		} catch (NullPointerException e) { }
 		
 		return false;
+	}
+	
+	/**
+	 * Return Team corresponding to a flag Block
+	 * @param block
+	 * @return Team or null if not found
+	 */
+	public synchronized Team getTeamByFlag(Block block){
+		for (Map.Entry<String, Team> entry : teams.entrySet()) {
+			Team team = entry.getValue();
+			if(team.isTeamFlag(block)){
+				return team;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Test if picked up item is a flag.
+	 * @param player
+	 * @param item
+	 * @return true if item is a flag, false otherwise
+	 */
+	public synchronized void pickUpFlag(Player player, Item item){
+		ItemStack itemStack = item.getItemStack();
+		if(itemStack.getType() == Material.WOOL){
+			Wool wool = (Wool) itemStack.getData();
+			Team flagTeam = this.getTeamByColor(wool.getColor().toString());
+			Team playerTeam = this.getPlayerTeam(player);
+			if(playerTeam == null){
+				return;
+			}
+			if(flagTeam != null){
+				if(flagTeam.isLootableFlag()){
+					if(playerTeam == flagTeam){
+						flagTeam.setRetrieved();
+						plugin.sendBroadcastMessage(String.format("%s has retrieved his %s flag !", player.getName(), playerTeam.getColor().toLowerCase()));
+					}else{
+						flagTeam.setRunner(player);
+						plugin.sendBroadcastMessage(String.format("%s has picked up the %s flag !", player.getName(), flagTeam.getColor().toLowerCase()));
+					}
+				}
+			}
+			item.remove();
+		}
 	}
 }

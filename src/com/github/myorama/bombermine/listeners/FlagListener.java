@@ -3,6 +3,7 @@ package com.github.myorama.bombermine.listeners;
 import com.github.myorama.bombermine.Bombermine;
 import com.github.myorama.bombermine.models.Team;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,7 +13,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Wool;
 
 public class FlagListener implements Listener {
 	
@@ -24,7 +24,6 @@ public class FlagListener implements Listener {
 	
 	/**
 	 * Flag management on PlayerPickupItemEvent
-	 * 
 	 * @param event
 	 */
 	@EventHandler
@@ -32,25 +31,9 @@ public class FlagListener implements Listener {
 
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem().getItemStack();
-
 		if (item.getType() == Material.WOOL) {
-
-			Wool wool = (Wool) item.getData();
-			Team team = plugin.getCtfGame().getPlayerTeam(player);
-
-			if (team == null) {
-				event.setCancelled(true);
-
-			} else if (team.getFlagData().getColor() == wool.getColor()) {
-				// broadcast the niouz!
-				plugin.sendBroadcastMessage(String.format(
-						"%s%s pickup the %s flag!", ChatColor.LIGHT_PURPLE,
-						player.getDisplayName(), wool.getColor().toString()
-								.toLowerCase()));
-
-			} else {
-				// TODO que faire si l'équipe récupère son propre drapeau ?
-			}
+			this.plugin.getCtfGame().pickUpFlag(player, event.getItem());
+			event.setCancelled(true);
 		}
 	}
 	
@@ -66,13 +49,37 @@ public class FlagListener implements Listener {
 
 		Team team = plugin.getCtfGame().getPlayerTeam(player);
 		
-		if (team == null) {
-			event.setCancelled(true);
-		} else if (team.isTeamFlag(block)) {
-			player.sendMessage(String.format("%sYou cannot pick up your own team flag", ChatColor.RED));
-			event.setCancelled(true);
+		if(!this.plugin.getCtfGame().isStarted()){
+			if(player.getGameMode() != GameMode.CREATIVE){
+				event.setCancelled(true);
+				player.sendMessage(String.format("%sYou cannot interract while the game is stopped. Please start the game or get Creative mode", ChatColor.RED));
+				return;
+			}
+		}
+		else if(team == null){
+			if(player.getGameMode() != GameMode.CREATIVE){
+				event.setCancelled(true);
+				player.sendMessage(String.format("%sYou cannot interract while in spectator. Please join a team or get Creative mode", ChatColor.RED));
+				return;
+			}
 		}
 		
+		if(block.getType() == Material.WOOL){
+			Team flagTeam = this.plugin.getCtfGame().getTeamByFlag(block);
+			if(flagTeam != null){
+				if(player.getGameMode() == GameMode.CREATIVE){
+					event.setCancelled(true);
+					player.sendMessage(String.format("%sPlease use /bm team flag <color> to change flag position", ChatColor.RED));
+				}
+				else if(team == flagTeam){ // trying to break own team flag
+					player.sendMessage(String.format("%sYou cannot break your own flag", ChatColor.RED));
+					event.setCancelled(true);
+				}
+			}else{ // No drop for wool blocks that are not a flag
+				event.getBlock().setType(Material.AIR);
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	@EventHandler

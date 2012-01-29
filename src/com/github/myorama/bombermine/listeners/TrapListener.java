@@ -32,16 +32,15 @@ public class TrapListener implements Listener {
 	 */
 	@EventHandler
 	public void trapExplosion(PlayerMoveEvent event){
-		// TODO works during game only
-		Location loc = event.getTo().add(0, -0.5, 0);
-		Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
-		
-		// Bug fix if team is null
-		String color = null;
-		if (team != null) color = team.getColor();
-		
-		if (plugin.getTraps().isTeamTrapped(loc, color)) {
-			plugin.getTraps().explode(loc);
+		if(plugin.getCtfGame().isStarted()){
+			Location loc = event.getTo().add(0, -0.5, 0);
+			Team team = plugin.getCtfGame().getPlayerTeam(event.getPlayer());
+			
+			if (team != null){
+				if (plugin.getTraps().isTeamTrapped(loc, team.getColor())) {
+					plugin.getTraps().explode(loc);
+				}
+			}
 		}
 	}
 	
@@ -53,6 +52,13 @@ public class TrapListener implements Listener {
 	public void noExplosionDrops(EntityExplodeEvent event){
 		List<Block> wouldExplode = event.blockList();
 		for (Block block : wouldExplode) {
+			// Flag won't explode
+			if(block.getType() == Material.WOOL){
+				if(this.plugin.getCtfGame().getTeamByFlag(block) != null){
+					continue;
+				}
+			}
+			
 			block.setType(Material.AIR);
 			
 			// Detect if others landmines would explode

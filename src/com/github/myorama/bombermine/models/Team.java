@@ -2,12 +2,11 @@ package com.github.myorama.bombermine.models;
 
 import com.github.myorama.bombermine.Bombermine;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Wool;
 
@@ -152,31 +151,33 @@ public class Team {
 	
 	public Wool getFlagData() { return flagData; }
 	
+	public Block getFlag(){
+		return this.flag;
+	}
+	
 	/**
 	 * Remove old flag and set the new flag block
 	 * @param flagBlock 
 	 */
 	public void setFlag(Block flagBlock) {
-		synchronized(flagLock){
-			// Remove old flag
-			if(this.flag != null){
-				if(this.flag.getType() == Material.WOOL){
-					this.flag.setType(Material.AIR);
-				}
+		// Remove old flag
+		if(this.flag != null){
+			if(this.flag.getType() == Material.WOOL){
+				this.flag.setType(Material.AIR);
 			}
-			// Set new flag
-			this.flag = flagBlock;
-			this.flag.setType(Material.WOOL);
-			this.flag.setData(flagData.getData());
-
-			Location flagLoc = flagBlock.getLocation();
-			String configFlagLoc = String.format("%s/%s/%s/%s", 
-					flagLoc.getWorld().getName(),
-					flagLoc.getBlockX(),
-					flagLoc.getBlockY(),
-					flagLoc.getBlockZ());;
-			this.saveConfig("flag_loc", configFlagLoc);
 		}
+		// Set new flag
+		this.flag = flagBlock;
+		this.flag.setType(Material.WOOL);
+		this.flag.setData(flagData.getData());
+
+		Location flagLoc = flagBlock.getLocation();
+		String configFlagLoc = String.format("%s/%s/%s/%s", 
+				flagLoc.getWorld().getName(),
+				flagLoc.getBlockX(),
+				flagLoc.getBlockY(),
+				flagLoc.getBlockZ());;
+		this.saveConfig("flag_loc", configFlagLoc);
 	}
 	
 	/**
@@ -185,6 +186,26 @@ public class Team {
 	 */
 	public Player getRunner(){
 		return this.runner;
+	}
+	
+	/**
+	 * Set the current runner
+	 * @param player 
+	 */
+	public void setRunner(Player player){
+		this.runner = player;
+	}
+	
+	public void setRetrieved(){
+		this.flag.setType(Material.WOOL);
+		this.flag.setData(flagData.getData());
+	}
+	
+	public boolean isLootableFlag(){
+		if(this.flag.getType() == Material.AIR && this.runner == null){
+			return true;
+		}
+		return false;
 	}
 	
 	private void saveConfig(String key, String value){
