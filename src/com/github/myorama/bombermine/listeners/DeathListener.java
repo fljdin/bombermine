@@ -45,14 +45,8 @@ public class DeathListener implements Listener {
 			Team t = plugin.getCtfGame().getPlayerTeam(player);
 			
 			if (t != null) {
-				// Drop only flags if presents
-				List<ItemStack> flags = new ArrayList<ItemStack>();
-				for (ItemStack item : event.getDrops()) {
-					if (item.getType() == Material.WOOL) {
-						flags.add(item);
-					}
-				}				
-				event.getDrops().retainAll(flags);
+				// Never drop
+				event.getDrops().retainAll(new ArrayList<ItemStack>());
 				plugin.getCtfGame().removeRunner(player);
 
 				// Start cooldown for this player

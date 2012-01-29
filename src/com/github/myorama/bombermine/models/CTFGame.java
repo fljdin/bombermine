@@ -379,11 +379,17 @@ public class CTFGame {
 		}
 	}
 	
+	/**
+	 * Player drop all his flags and is no more the runner
+	 * @param player 
+	 */
 	public synchronized void removeRunner(Player player){
 		for (Map.Entry<String, Team> entry : teams.entrySet()) {
 			Team team = entry.getValue();
 			if(team.getRunner() == player){
 				team.setRunner(null);
+				ItemStack flag = new ItemStack(Material.WOOL, 1, (short)0, team.getFlagData().getData());
+				world.dropItem(player.getLocation(), flag);
 				plugin.sendBroadcastMessage(String.format("%s has lost the %s flag", player.getName(), entry.getKey().toLowerCase()));
 			}
 		}
