@@ -284,7 +284,11 @@ public class CTFGame {
 	
 	public synchronized boolean removePlayer(Player player){
 		Team currentTeam = this.getPlayerTeam(player);
-		boolean ret = currentTeam.removePlayer(player);
+		boolean ret = false;
+		if(currentTeam != null){
+			ret = currentTeam.removePlayer(player);
+		}
+		
 		if(ret){
 			if(isStarted()){
 				// Dropping flags
@@ -371,6 +375,29 @@ public class CTFGame {
 				world.dropItem(player.getLocation(), flag);
 				plugin.sendBroadcastMessage(String.format("%s has lost the %s flag", player.getName(), entry.getKey().toLowerCase()));
 			}
+		}
+	}
+	
+	
+	public synchronized void tryWinFlags(Player player, Location destination){
+		
+		Team playerTeam = this.plugin.getCtfGame().getPlayerTeam(player);
+		if (playerTeam != null) {
+			if(playerTeam.getFlag().getType() != Material.AIR){
+				Location flagLoc = playerTeam.getFlag().getLocation();
+				if (Math.abs(destination.getBlockX() - flagLoc.getBlockX()) <= 1
+						&& Math.abs(destination.getBlockY() - flagLoc.getBlockY()) <= 1
+						&& Math.abs(destination.getBlockZ() - flagLoc.getBlockZ()) <= 1) {
+					for (Map.Entry<String, Team> entry : teams.entrySet()) {
+						Team team = entry.getValue();
+						if(team.getRunner() == player){
+							team.retrieved();
+							plugin.sendBroadcastMessage(String.format("%s has brought the %s flag and won a point", player.getName(), entry.getKey().toLowerCase()));
+						}
+					}
+				}
+			}
+			
 		}
 	}
 	
