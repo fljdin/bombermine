@@ -359,40 +359,6 @@ public class CTFGame {
 	}
 	
 	/**
-	 * Pick up the flag
-	 * @param player
-	 * @param item
-	 * @return true if flag is picked up, false otherwise
-	 */
-	public synchronized void pickUpFlag(PlayerPickupItemEvent event){
-		Player player = event.getPlayer();
-		Item item = event.getItem();
-		ItemStack itemStack = item.getItemStack();
-		if(itemStack.getType() == Material.WOOL){
-			Wool wool = (Wool) itemStack.getData();
-			Team flagTeam = this.getTeamByColor(wool.getColor().toString());
-			Team playerTeam = this.getPlayerTeam(player);
-			if(playerTeam == null){
-				event.setCancelled(true);
-				return;
-			}
-			if(flagTeam != null){
-				if(flagTeam.isLootableFlag()){
-					if(playerTeam == flagTeam){
-						flagTeam.retrieved();
-						plugin.sendBroadcastMessage(String.format("%s has retrieved his %s flag !", player.getName(), playerTeam.getColor().toLowerCase()));
-						item.remove();
-						event.setCancelled(true);
-					}else{
-						flagTeam.setRunner(player);
-						plugin.sendBroadcastMessage(String.format("%s has picked up the %s flag !", player.getName(), flagTeam.getColor().toLowerCase()));
-					}
-				}
-			}
-		}
-	}
-	
-	/**
 	 * Player drop all his flags and is no more the runner
 	 * @param player 
 	 */

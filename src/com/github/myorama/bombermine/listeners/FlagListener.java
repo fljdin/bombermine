@@ -7,6 +7,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,8 +33,33 @@ public class FlagListener implements Listener {
 	 */
 	@EventHandler
 	public void pickUpFlag(PlayerPickupItemEvent event) {
-		// rooting event to call a CTFGame synchronized method
-		this.plugin.getCtfGame().pickUpFlag(event);
+		Player player = event.getPlayer();
+		Item item = event.getItem();
+		ItemStack itemStack = item.getItemStack();
+		if(itemStack.getType() == Material.WOOL){
+			Wool wool = (Wool) itemStack.getData();
+			synchronized(this.plugin.getCtfGame()){
+				Team flagTeam = this.plugin.getCtfGame().getTeamByColor(wool.getColor().toString());
+				Team playerTeam = this.plugin.getCtfGame().getPlayerTeam(player);
+				if(playerTeam == null){
+					event.setCancelled(true);
+					return;
+				}
+				if(flagTeam != null){
+					if(flagTeam.isLootableFlag()){
+						if(playerTeam == flagTeam){
+							flagTeam.retrieved();
+							plugin.sendBroadcastMessage(String.format("%s has retrieved his %s flag !", player.getName(), playerTeam.getColor().toLowerCase()));
+							item.remove();
+							event.setCancelled(true);
+						}else{
+							flagTeam.setRunner(player);
+							plugin.sendBroadcastMessage(String.format("%s has picked up the %s flag !", player.getName(), flagTeam.getColor().toLowerCase()));
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**
