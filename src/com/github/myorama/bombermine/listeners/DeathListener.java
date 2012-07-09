@@ -36,7 +36,6 @@ public class DeathListener implements Listener {
 	 */
 	@EventHandler
 	public void respawnCooldown(EntityDeathEvent event){
-		// TODO log killer name for scoring
 		Entity e = event.getEntity();
 		
 		if (e instanceof Player) {
