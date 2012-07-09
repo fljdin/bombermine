@@ -1,11 +1,15 @@
 package com.github.myorama.bombermine.models;
 
+import com.github.myorama.bombermine.Bombermine;
 import java.util.ArrayList;
 import java.util.Map;
-
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
 public class Team {
@@ -16,8 +20,13 @@ public class Team {
 	private Location spawn = null;
 	private ArrayList<Player> players = null;
 
-	private Wool flag = null;
-	private Location flagLoc = null;
+	private Block flag = null;
+	private Wool flagData = null;
+	/**
+	 * Player running with the flag or null
+	 */
+	private Player runner = null;
+	private final Object flagLock = new Object();
 
 	/**
 	 * Constructor with CTFGame instance
@@ -38,6 +47,14 @@ public class Team {
 		if(config != null){
 			try {
 				this.color = ((String)config.get("color")).toUpperCase();
+				try{
+					flagData = new Wool(DyeColor.valueOf(color));
+				}
+				catch(IllegalArgumentException iae){
+					flagData = null;
+					Bombermine.log.warning(String.format("%s is not a valid color.", this.color));
+					return false;
+				}
 				this.name = (String)config.get("name");
 
 				String[] coords = config.get("spawn").toString().split("/");
@@ -58,15 +75,15 @@ public class Team {
 					World world = this.ctfGame.getPlugin().getServer().getWorld(coords[0]);
 					if(world != null){
 						if(coords.length == 4) {
-							this.flagLoc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
+							Location flagLoc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]));
+							this.flag = flagLoc.getBlock();
 						}
 					}
 				}
 				
 				// Checking if config has been read successfully
-				if(this.name != null && this.spawn != null && flagLoc != null) {
+				if(this.name != null && this.spawn != null && this.flag != null && this.flagData != null) {
 					this.players = new ArrayList<Player>();
-					// TODO initialize this.flag, this.flagItem
 					return true;
 				}
 			} catch (Exception e) {
@@ -95,37 +112,153 @@ public class Team {
 	}
 	
 	public ArrayList<Player> getPlayers() { return players; }
+	
 	public boolean hasPlayer(Player p) { return players.contains(p); }
+	
+	/**
+	 * Spawn players and set their inventory
+	 * @param player 
+	 */
 	public void spawnPlayers() {
-		for(Player p : players) {
-			p.teleport(this.spawn);
+		for(Player player : players) {
+			spawn(player);
 		}
 	}
 	
-	public boolean isTeamFlag(Wool wool) {
-		return wool.getColor().toString().equals(color);
+	/**
+	 * Spawn player and set his inventory
+	 * @param player 
+	 */
+	public void spawn(Player player){
+		player.teleport(respawn(player));
 	}
 	
-	/* Accessors */
+	/**
+	 * Respawn player
+	 * @param player
+	 * @return Location
+	 */
+	public Location respawn(Player player){
+		// Cleaning inventory
+		ItemStack[] itemStacks = player.getInventory().getContents();
+		for (ItemStack itemStack : itemStacks) {
+			if(itemStack != null){
+				player.getInventory().remove(itemStack);
+			}
+		}
+		
+		// TODO set player inventory
+//		player.getInventory().addItem(new ItemStack(Material.APPLE));
+		
+		return this.spawn;
+	}
+	
+	/**
+	 * Test if parameter is this team flag
+	 * @param block
+	 * @return true or false
+	 */
+	public boolean isTeamFlag(Block block) {
+		return (block.getWorld() == this.flag.getWorld()
+				&& block.getX() == this.flag.getX()
+				&& block.getY() == this.flag.getY()
+				&& block.getZ() == this.flag.getZ());
+	}
+	
 	public String getColor() { return color; }
+	
 	public String getName() { return name; }
 
 	public Location getSpawnLoc() { return spawn; }
-	public void setSpawnLoc(Location l) { spawn = l; }
 	
-	public String getSpawnCoords() {
-		return String.format("%s/%s/%s/%s/%s/%s", 
+	public void setSpawnLoc(Location l) {
+		this.spawn = l;
+		String configSpawn = String.format("%s/%s/%s/%s/%s/%s", 
 				spawn.getWorld().getName(),
 				spawn.getBlockX(),
 				spawn.getBlockY(),
 				spawn.getBlockZ(),
 				spawn.getYaw(),
 				spawn.getPitch());
+		this.saveConfig("spawn", configSpawn);
 	}
 	
-	public Wool getFlag() { return flag; }
-	public void setFlag(Wool w) { flag = w; }
+	public Wool getFlagData() { return flagData; }
+	
+	public Block getFlag(){
+		return this.flag;
+	}
+	
+	/**
+	 * Remove old flag and set the new flag block
+	 * @param flagBlock 
+	 */
+	public void setFlag(Block flagBlock) {
+		// Remove old flag
+		if(this.flag != null){
+			if(this.flag.getType() == Material.WOOL){
+				this.flag.setType(Material.AIR);
+			}
+		}
+		// Set new flag
+		this.flag = flagBlock;
+		this.flag.setType(Material.WOOL);
+		this.flag.setData(flagData.getData());
 
-	public Location getFlagLoc() { return flagLoc; }
-	public void setFlagLoc(Location fl) { flagLoc = fl;	}
+		Location flagLoc = flagBlock.getLocation();
+		String configFlagLoc = String.format("%s/%s/%s/%s", 
+				flagLoc.getWorld().getName(),
+				flagLoc.getBlockX(),
+				flagLoc.getBlockY(),
+				flagLoc.getBlockZ());;
+		this.saveConfig("flag_loc", configFlagLoc);
+	}
+	
+	/**
+	 * Get current runner if there is one
+	 * @return Player that runs with the flag or null
+	 */
+	public Player getRunner(){
+		return this.runner;
+	}
+	
+	/**
+	 * Set the current runner
+	 * @param player 
+	 */
+	public void setRunner(Player player){
+		this.runner = player;
+	}
+	
+	public void retrieved(){
+		// Remove flag from runner invetory (useful when starting or stopping game)
+		if(this.runner != null){
+			ItemStack[] itemStacks = this.runner.getInventory().getContents();
+			for (ItemStack itemStack : itemStacks) {
+				if(itemStack != null){
+					if(itemStack.getType() == Material.WOOL){
+						Wool wool = (Wool)itemStack.getData();
+						if(wool.getColor() == this.flagData.getColor()){
+							this.runner.getInventory().remove(itemStack);
+							break;
+						}
+					}
+				}
+			}
+			this.runner = null;
+		}
+		this.flag.setType(Material.WOOL);
+		this.flag.setData(flagData.getData());
+	}
+	
+	public boolean isLootableFlag(){
+		if(this.flag.getType() == Material.AIR && this.runner == null){
+			return true;
+		}
+		return false;
+	}
+	
+	private void saveConfig(String key, String value){
+		ctfGame.saveTeamConfig(color, key, value);
+	}
 }

@@ -8,20 +8,25 @@ import com.github.myorama.bombermine.Bombermine;
 import com.github.myorama.bombermine.models.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author Nittero
+ * 
+ * @category CFT Game
+ * @version all
  */
 public class BombermineCommandExecutor implements CommandExecutor {
 
 	private Bombermine plugin;
 	private final String ERROR_PLAYER_ONLY = ChatColor.RED + "You must be a player to do this.";
 	private final String ERROR_UNAUTHORIZED = ChatColor.RED + "You have not the right to do this";
+	private final String ERROR_GAME_STARTED = ChatColor.RED + "Stop the game to do that (/bm stop)";
+	private final Object startLock = new Object();
 
 	public BombermineCommandExecutor(Bombermine instance) {
 		this.plugin = instance;
@@ -159,9 +164,14 @@ public class BombermineCommandExecutor implements CommandExecutor {
 								if(args.length == 3){ // team spawn <team>
 									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
 									if(team != null){
-										team.setSpawnLoc(player.getLocation());
-										plugin.getCtfGame().saveTeamConfig(team.getColor(), "spawn", team.getSpawnCoords());
-										sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
+										synchronized(startLock){
+											if(!this.plugin.getCtfGame().isStarted()){
+												team.setSpawnLoc(player.getLocation());
+												sender.sendMessage(msgColor + "Team spawn location set for " + args[2] + " team");
+											}else{
+												sender.sendMessage(errColor + ERROR_GAME_STARTED);
+											}
+										}
 									}else{
 										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
 									}
@@ -174,11 +184,44 @@ public class BombermineCommandExecutor implements CommandExecutor {
 						}else{
 							sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
 						}
+					}else if(args[1].equals("flag")){
+						if(player != null){
+							if(hasAdminRights(player)){
+								if(args.length == 3){ // team flag <team>
+									Team team = this.plugin.getCtfGame().getTeamByColor(args[2]);
+									if(team != null){
+										Block flag = player.getTargetBlock(null, 30);
+										if(flag != null){
+											synchronized(startLock){
+												if(!this.plugin.getCtfGame().isStarted()){
+													team.setFlag(flag);
+													sender.sendMessage(msgColor + "Team flag location set for " + args[2] + " team");
+												}else{
+													sender.sendMessage(errColor + ERROR_GAME_STARTED);
+												}
+											}
+										}else{
+											sender.sendMessage(errColor + "You need to target the flag location");
+										}
+									}else{
+										sender.sendMessage(errColor + " Team \"" + args[2] + "\" does not exist");
+									}
+								}else{
+									sender.sendMessage(msgColor + "/bm team flag <team>");
+								}
+							}else{
+								sender.sendMessage(errColor + ERROR_UNAUTHORIZED);
+							}
+						}else{
+							sender.sendMessage(errColor + ERROR_PLAYER_ONLY);
+						}
 					}
 				}else{
 					sender.sendMessage(msgColor + "/bm team spawn <team>");
+					sender.sendMessage(msgColor + "/bm team flag <team>");
 				}
-			}else if (args[0].equals("home")) {
+			}
+			else if (args[0].equals("home")) {
 				if(args.length == 1){ // home
 					if(player != null){
 						if(hasAdminRights(player)){
@@ -194,7 +237,35 @@ public class BombermineCommandExecutor implements CommandExecutor {
 					sender.sendMessage(msgColor + "/bm home");
 				}
 			}
-			
+			else if (args[0].equals("start")) {
+				if(hasModRights(player)){
+					synchronized(startLock){
+						if(!this.plugin.getCtfGame().isStarted()){
+							this.plugin.getCtfGame().start();
+						}else{
+							player.sendMessage(errColor + "The game is already started");
+						}
+					}
+				}
+			}
+			else if (args[0].equals("stop")) {
+				if(hasModRights(player)){
+					synchronized(startLock){
+						if(this.plugin.getCtfGame().isStarted()){
+							this.plugin.getCtfGame().stop();
+						}else{
+							player.sendMessage(errColor + "The game is is not started");
+						}
+					}
+				}
+			}
+			else if (args[0].equals("restart")) {
+				if(hasModRights(player)){
+					synchronized(startLock){
+						this.plugin.getCtfGame().restart();
+					}
+				}
+			}
 		}
 		return true;
 	}

@@ -3,6 +3,7 @@ bombermine:
     max_team_players: 5
     respawn_cooldown: 10
     home_world: default
+    friendly_fire: false
   teams:
   - color: RED
     name: Equipe des rouges

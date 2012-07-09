@@ -2,17 +2,25 @@
 --- BOMBERMINE Bukkit plugin ---
 --------------------------------
 
+VERSION 0.3
+	CTF Mod:
+	* Configurable friendly-fire option
+
+	Gameplay:
+	* Teleport items for each team
+
 VERSION 0.2
-	Game:
+	CTF Mod:
 	* Each team owns colored block of wool (a.k.a flag)
 	* Configure home and team spawns
 	* Players can interract with flags (pick up & drop on death)
+	* CommandExecutor support
 	
 VERSION 0.1
-	Game:
+	CTF Mod:
 	* Join a team manualy or with autobalance
 	* Cooldown respawn
 	
-	Features:
+	Gameplay:
 	* Explosives Traps with chaining
 	* Sprint accelerator blocs

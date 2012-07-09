@@ -3,11 +3,14 @@ package com.github.myorama.bombermine;
 import com.github.myorama.bombermine.commandexecutors.BombermineCommandExecutor;
 import com.github.myorama.bombermine.listeners.AccelerationListener;
 import com.github.myorama.bombermine.listeners.DeathListener;
+import com.github.myorama.bombermine.listeners.FlagListener;
 import com.github.myorama.bombermine.listeners.SpawnListener;
 import com.github.myorama.bombermine.listeners.ItemListener;
 import com.github.myorama.bombermine.listeners.TrapListener;
 import com.github.myorama.bombermine.models.CTFGame;
 import com.github.myorama.bombermine.models.Traps;
+import com.github.myorama.bombermine.queues.RespawnQueue;
+
 import java.io.File;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -40,6 +43,7 @@ public class Bombermine extends JavaPlugin {
 		pm.registerEvents(new TrapListener(this), this);
 		pm.registerEvents(new SpawnListener(this), this);
 		pm.registerEvents(new ItemListener(this), this);
+		pm.registerEvents(new FlagListener(this), this);
 				
 		// Copying and merging default config.yml file to plugin folder
 		this.getConfig().options().copyDefaults(true);
@@ -48,7 +52,7 @@ public class Bombermine extends JavaPlugin {
 		// Initialize CTF game
 		this.ctfGame = new CTFGame(this);
 		this.ctfGame.initialize();
-		
+				
 		// Instanting CommandExecutor
 		this.cmdExec = new BombermineCommandExecutor(this);
 		this.getCommand("bm").setExecutor(cmdExec);

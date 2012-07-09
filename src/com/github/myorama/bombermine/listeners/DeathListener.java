@@ -1,13 +1,13 @@
 package com.github.myorama.bombermine.listeners;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import com.github.myorama.bombermine.Bombermine;
 import com.github.myorama.bombermine.models.Team;
+import com.github.myorama.bombermine.queues.RespawnQueue;
+
+import org.bukkit.GameMode;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -40,21 +40,19 @@ public class DeathListener implements Listener {
 		Entity e = event.getEntity();
 		
 		if (e instanceof Player) {
-			Team t = plugin.getCtfGame().getPlayerTeam((Player)e);
+			Player player = (Player)e;
+			Team t = plugin.getCtfGame().getPlayerTeam(player);
 			
 			if (t != null) {
-				// Drop only flags if presents
-				List<ItemStack> flags = new ArrayList<ItemStack>();
-				for (ItemStack item : event.getDrops()) {
-					if (item.getType() == Material.WOOL) {
-						flags.add(item);
-					}
-				}				
-				event.getDrops().retainAll(flags);
+				// Never drop
+				event.getDrops().retainAll(new ArrayList<ItemStack>());
+				plugin.getCtfGame().removeRunner(player);
 
 				// Start cooldown for this player
-				plugin.getCtfGame().addCooldown((Player)e);				
-			}			
+				if(player.getGameMode() != GameMode.CREATIVE){
+					RespawnQueue.addCooldown(player);
+				}
+			}
 		}
 	}
 	
@@ -64,7 +62,7 @@ public class DeathListener implements Listener {
 	 */
 	@EventHandler
 	public void respawnTime(PlayerMoveEvent event){
-		if (plugin.getCtfGame().isCooldowned(event.getPlayer())) {
+		if (RespawnQueue.isCooldowned(event.getPlayer())) {
 			Location to = event.getTo();
 			Location from = event.getFrom();
 			
@@ -74,7 +72,8 @@ public class DeathListener implements Listener {
 			if (!limitPos.equals(currentPos)) {
 				from.setYaw(to.getYaw());
 				from.setPitch(to.getPitch());
-				event.setTo(from.add(0,0.5,0));
+				event.setTo(from);
+				//event.setTo(from.add(0,0.5,0));
 			}
 		}
 	}
